@@ -7,38 +7,74 @@ CodeTalks command
 package main
 
 import (
+	"flag"
 	"fmt"
-	"github.com/92hackers/code-talks/internal/file"
-	// "os"
+	"github.com/92hackers/code-talks/internal/scanner"
+	"log"
+	"os"
+	"path/filepath"
 )
 
-// RootDir is the root directory of the codebase
-var RootDir string
+type cliOptions struct {
+	outputFormat string
+}
 
-func main() {
-	file := &file.CodeFile{
-		FileMetadata: file.FileMetadata{
-			Name:           "main.go",
-			Path:           "go.mod",
-			Directory:      "internal",
-			FileType:       file.CODE_FILE,
-			LastModifiedAt: 100,
-		},
-		FileContent: file.FileContent{
-			Size:    0,
-			Content: "",
-		},
-		CodeCount:    10,
-		CommentCount: 10,
-		BlankCount:   10,
-		Language:     "Go",
+func parseOptions() *cliOptions {
+	// Cli flags processing
+	isPrintVersion := flag.Bool("version", false, "Print the version of the code-talks")
+	outputFormat := flag.String("output", "table", "Output format of the code-talks")
+	flag.Parse()
+
+	if *isPrintVersion {
+		fmt.Println("CodeTalks v0.1")
+		return nil
 	}
 
-	fmt.Println(file.Language)
-	fmt.Println(file.LastModifiedAt)
+	return &cliOptions{
+		outputFormat: *outputFormat,
+	}
+}
 
-	file.Analyze()
+func getRootDir() string {
+	workingDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	fmt.Println(file.Content)
-	fmt.Println(file.Size)
+	rootDir := workingDir
+
+	cliArgs := flag.Args()
+	if len(cliArgs) > 0 {
+		dir := cliArgs[0] // Only support analyzing one directory currently.
+		rootDir = filepath.Join(workingDir, dir)
+
+		dirInfo, err := os.Stat(rootDir) // Follow the symbolic link
+		switch {
+		case os.IsNotExist(err):
+			log.Fatalf("Directory %s does not exist", rootDir)
+		case os.IsPermission(err):
+			log.Fatalf("No permission to access directory %s", rootDir)
+		case err != nil:
+			log.Fatalf("Error accessing directory %s", rootDir)
+		}
+
+		if !dirInfo.IsDir() {
+			log.Fatalf("%s is not a directory, only directory supported now.", rootDir)
+		}
+	}
+
+	return rootDir
+}
+
+func main() {
+	// Parse the cli options
+	cliOptions := parseOptions()
+	fmt.Println("output format: ", cliOptions.outputFormat)
+
+	// Get the root directory
+	rootDir := getRootDir()
+	fmt.Println("rootDir: ", rootDir)
+
+	// Scan the directory
+	scanner.Scan(rootDir)
 }
