@@ -6,6 +6,6 @@ Scanner.
 
 package scanner
 
-func scan(dir string) {
-  // Scan files
+func Scan(dir string) {
+	// Scan files
 }

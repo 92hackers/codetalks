@@ -5,9 +5,9 @@ Output as JSON format.
 package output
 
 import (
-  "fmt"
+	"fmt"
 )
 
 func OutputJson(data [][]string) {
-  // Output as JSON format
+	// Output as JSON format
 }
