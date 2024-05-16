@@ -33,9 +33,9 @@ func handler(path string, d fs.DirEntry, err error) error {
 	if d.IsDir() {
 		fmt.Println("dir:", path)
 
+		// TODO: Skip specified-ignored directories
 		// Skip VCS directories
 		_, dir := filepath.Split(path)
-		fmt.Println("last segment:", dir)
 		if isVCSDir(dir) {
 			return fs.SkipDir
 		}
