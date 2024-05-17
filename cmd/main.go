@@ -86,6 +86,9 @@ func main() {
 
 	fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
 
+	// Analyze code files
+	language.AnalyzeAllLanguages()
+
 	for k, v := range language.AllLanguagesMap {
 		fmt.Print(k, ": ")
 		fmt.Println(len(v.CodeFiles))

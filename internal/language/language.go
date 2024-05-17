@@ -70,3 +70,16 @@ func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
 	language.AddCodeFile(file)
 	return language
 }
+
+// AnalyzeAllLanguages analyzes all code files and accumulates the data.
+func AnalyzeAllLanguages() {
+	for _, language := range AllLanguagesMap {
+		for _, file := range language.CodeFiles {
+			f, err := file.Analyze()
+			if err != nil {
+				continue
+			}
+			language.AddCodeFile(f)
+		}
+	}
+}
