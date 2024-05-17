@@ -12,8 +12,10 @@ import (
 	"github.com/92hackers/code-talks/internal"
 )
 
+type CodeFile internal.CodeFile
+
 // NewFile creates a new CodeFile
-func NewCodeFile(path string) *internal.CodeFile {
+func NewCodeFile(path string) *CodeFile {
 	if filepath.IsAbs(path) == false {
 		path, _ = filepath.Abs(path)
 	}
@@ -30,7 +32,7 @@ func NewCodeFile(path string) *internal.CodeFile {
 		return nil
 	}
 
-	codeFile := &internal.CodeFile{
+	codeFile := &CodeFile{
 		FileMetadata: FileMetadata{
 			Name:           file,
 			Path:           path,
@@ -45,6 +47,7 @@ func NewCodeFile(path string) *internal.CodeFile {
 		CodeCount:    0,
 		CommentCount: 0,
 		BlankCount:   0,
+    TotalLines:   0,
 		Language:     internal.SupportedLanguages[fileExt],
 	}
 
@@ -54,7 +57,7 @@ func NewCodeFile(path string) *internal.CodeFile {
 	return codeFile
 }
 
-func (f *internal.CodeFile) Analyze() *internal.CodeFile {
+func (f *CodeFile) Analyze() *CodeFile {
 	content, err := os.ReadFile(f.Path)
 	if err != nil {
 		log.Fatal(err)

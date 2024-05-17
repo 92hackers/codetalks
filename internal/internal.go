@@ -7,8 +7,8 @@ package internal
 // Language represents a programming language.
 type Language struct {
 	// Language metadata
+	Name         string `json:"name"`
 	FileExtension string `json:"file_extension"`
-	Lable         string `json:"label"`
 
 	// Cloc data
 	CodeCount    uint32 `json:"code"`
@@ -21,41 +21,57 @@ type Language struct {
 }
 
 // All programming language types detected by codetalks.
+// { language-name: Language }
 var AllLanguagesMap map[string]*Language
 
-// Supported programming languages, map as file extension -> language label.
-const SupportedLanguages = map[string]string{
-	".c":     "C",
-	".cpp":   "C++",
-	".cs":    "C#",
-	".java":  "Java",
-	".js":    "JavaScript",
-	".php":   "PHP",
-	".py":    "Python",
-	".rb":    "Ruby",
-	".rs":    "Rust",
-	".swift": "Swift",
-	".go":    "Go",
-	".kt":    "Kotlin",
-	".ts":    "TypeScript",
-	".scala": "Scala",
-	".r":     "R",
-	".sh":    "Shell",
-	".pl":    "Perl",
-	".lua":   "Lua",
-	".html":  "HTML",
-	".css":   "CSS",
-	".xml":   "XML",
-	".json":  "JSON",
-	".yaml":  "YAML",
-	".toml":  "TOML",
-	".md":    "Markdown",
-	".txt":   "Text",
+// LanguageDefinition represents a programming language definition.
+type LanguageDefinition struct {
+  Name         string `json:"name"`
+  lineComment  []string `json:"line_comment"`
+  blockComment [][]string `json:"block_comment"`
+}
+
+func newLangDef(name string, lineComment []string, blockComment [][]string) *LanguageDefinition {
+  return &LanguageDefinition{
+    Name: name,
+    lineComment: lineComment,
+    blockComment: blockComment,
+  }
+}
+
+// Supported programming languages, map as file extension -> language name.
+var SupportedLanguages = map[string]*LanguageDefinition{
+	".c":     newLangDef("C", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cpp":   newLangDef("C++", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cs":    newLangDef("C#", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".java":  newLangDef("Java", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".js":    newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".php":   newLangDef("PHP", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".py":    newLangDef("Python", []string{"#"}, [][]string{{"\"\"\"", "\"\"\""}}),
+  ".rb":    newLangDef("Ruby", []string{"#"}, [][]string{{":=begin", ":=end"}}),
+	".rs":    newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".swift": newLangDef("Swift", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".go":    newLangDef("Go", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".kt":    newLangDef("Kotlin", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".ts":    newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".scala": newLangDef("Scala", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".r":     newLangDef("R", []string{"#"}, [][]string{{"/*", "*/"}}),
+	".sh":    newLangDef("Shell", []string{"#"}, [][]string{{"", ""}}),
+  ".pl":    newLangDef("Perl", []string{"#"}, [][]string{{":=", ":=cut"}}),
+	".lua":   newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
+	".html":  newLangDef("HTML", []string{"<!--", "//"}, [][]string{{"<!--", "-->"}}),
+	".css":   newLangDef("CSS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".xml":   newLangDef("XML", []string{"<!--"}, [][]string{{"<!--", "-->"}}),
+	".json":  newLangDef("JSON", []string{}, [][]string{{"", ""}}),
+	".yaml":  newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),
+	".toml":  newLangDef("TOML", []string{"#"}, [][]string{{"", ""}}),
+	".md":    newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
+	".txt":   newLangDef("Plain Text", []string{}, [][]string{{"", ""}}),
 }
 
 // Config files, map as file name -> file label.
 // These files are commonly used in programming projects.
-const ConfigFiles = map[string]string{
+var ConfigFiles = map[string]string{
 	"makefile": "Makefile",
 	"rakefile": "Rakefile",
 	"gemfile":  "Gemfile",
@@ -102,6 +118,7 @@ type CodeFile struct {
 	CodeCount    uint32 `json:"code"`
 	CommentCount uint32 `json:"comment_count"`
 	BlankCount   uint32 `json:"blank_count"`
+  TotalLines   uint32 `json:"total_lines"`
 
 	// Code language
 	Language string `json:"language"`
