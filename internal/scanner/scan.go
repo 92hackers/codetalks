@@ -7,7 +7,7 @@ Scanner.
 package scanner
 
 import (
-	"fmt"
+	// "fmt"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -48,7 +48,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	}
 
 	// file
-	fmt.Println("Scanning file:", path)
+	// fmt.Println("Scanning file:", path)
 
 	// Skip unsupported file extensions
 	// TODO: maybe a config file
