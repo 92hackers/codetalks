@@ -9,10 +9,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/92hackers/code-talks/internal/scanner"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/92hackers/code-talks/internal/file"
+	"github.com/92hackers/code-talks/internal/language"
+	"github.com/92hackers/code-talks/internal/scanner"
 )
 
 type cliOptions struct {
@@ -46,8 +49,11 @@ func getRootDir() string {
 	cliArgs := flag.Args()
 	if len(cliArgs) > 0 {
 		dir := cliArgs[0] // Only support analyzing one directory currently.
-		rootDir = filepath.Join(workingDir, dir)
+		if rootDir, err = filepath.Abs(dir); err != nil {
+			log.Fatalf("Error getting absolute path of %s", dir)
+		}
 
+		// Check if the directory exists
 		dirInfo, err := os.Stat(rootDir) // Follow the symbolic link
 		switch {
 		case os.IsNotExist(err):
@@ -75,6 +81,13 @@ func main() {
 	rootDir := getRootDir()
 	fmt.Println("rootDir: ", rootDir)
 
-	// Scan the directory
+	// Scan root directory
 	scanner.Scan(rootDir)
+
+	fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
+
+	for k, v := range language.AllLanguagesMap {
+		fmt.Print(k, ": ")
+		fmt.Println(len(v.CodeFiles))
+	}
 }

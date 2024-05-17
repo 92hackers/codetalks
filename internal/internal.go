@@ -4,39 +4,19 @@ Internal
 
 package internal
 
-// Language represents a programming language.
-type Language struct {
-	// Language metadata
-	Name         string `json:"name"`
-	FileExtension string `json:"file_extension"`
-
-	// Cloc data
-	CodeCount    uint32 `json:"code"`
-	CommentCount uint32 `json:"comment_count"`
-	BlankCount   uint32 `json:"blank_count"`
-	TotalLines   uint32 `json:"total_lines"`
-
-	FileCount uint32 `json:"file_count"`
-	CodeFiles []*CodeFile
-}
-
-// All programming language types detected by codetalks.
-// { language-name: Language }
-var AllLanguagesMap map[string]*Language
-
 // LanguageDefinition represents a programming language definition.
 type LanguageDefinition struct {
-  Name         string `json:"name"`
-  lineComment  []string `json:"line_comment"`
-  blockComment [][]string `json:"block_comment"`
+	Name         string     `json:"name"`
+	lineComment  []string   `json:"line_comment"`
+	blockComment [][]string `json:"block_comment"`
 }
 
 func newLangDef(name string, lineComment []string, blockComment [][]string) *LanguageDefinition {
-  return &LanguageDefinition{
-    Name: name,
-    lineComment: lineComment,
-    blockComment: blockComment,
-  }
+	return &LanguageDefinition{
+		Name:         name,
+		lineComment:  lineComment,
+		blockComment: blockComment,
+	}
 }
 
 // Supported programming languages, map as file extension -> language name.
@@ -48,7 +28,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".js":    newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".php":   newLangDef("PHP", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".py":    newLangDef("Python", []string{"#"}, [][]string{{"\"\"\"", "\"\"\""}}),
-  ".rb":    newLangDef("Ruby", []string{"#"}, [][]string{{":=begin", ":=end"}}),
+	".rb":    newLangDef("Ruby", []string{"#"}, [][]string{{":=begin", ":=end"}}),
 	".rs":    newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".swift": newLangDef("Swift", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".go":    newLangDef("Go", []string{"//"}, [][]string{{"/*", "*/"}}),
@@ -57,7 +37,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".scala": newLangDef("Scala", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".r":     newLangDef("R", []string{"#"}, [][]string{{"/*", "*/"}}),
 	".sh":    newLangDef("Shell", []string{"#"}, [][]string{{"", ""}}),
-  ".pl":    newLangDef("Perl", []string{"#"}, [][]string{{":=", ":=cut"}}),
+	".pl":    newLangDef("Perl", []string{"#"}, [][]string{{":=", ":=cut"}}),
 	".lua":   newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
 	".html":  newLangDef("HTML", []string{"<!--", "//"}, [][]string{{"<!--", "-->"}}),
 	".css":   newLangDef("CSS", []string{"//"}, [][]string{{"/*", "*/"}}),
@@ -76,6 +56,11 @@ var ConfigFiles = map[string]string{
 	"rakefile": "Rakefile",
 	"gemfile":  "Gemfile",
 
+	// Version control
+	".gitignore":  ".gitignore",
+	".gitmodules": ".gitmodules",
+	".gitconfig":  ".gitconfig",
+
 	// Docker
 	"dockerfile":         "Dockerfile",
 	"docker-compose.yml": "Docker Compose file",
@@ -89,46 +74,3 @@ var ConfigFiles = map[string]string{
 	"go.mod": "go.mod",
 	"go.sum": "go.sum",
 }
-
-// File types
-const (
-	CODE_FILE = iota
-	CONFIG_FILE
-)
-
-type FileMetadata struct {
-	// File metadata
-	Name           string `json:"name"`
-	Path           string `json:"path"`
-	Directory      string `json:"directory"`
-	FileType       uint8  `json:"file_type"`
-	LastModifiedAt uint64 `json:"last_modified_at"`
-}
-
-type FileContent struct {
-	Size    uint64 `json:"size"`
-	Content string `json:"content"`
-}
-
-type CodeFile struct {
-	FileMetadata
-	FileContent
-
-	// Cloc data
-	CodeCount    uint32 `json:"code"`
-	CommentCount uint32 `json:"comment_count"`
-	BlankCount   uint32 `json:"blank_count"`
-  TotalLines   uint32 `json:"total_lines"`
-
-	// Code language
-	Language string `json:"language"`
-}
-
-var AllCodeFiles []*CodeFile
-
-type ConfigFile struct {
-	FileMetadata
-	FileContent
-}
-
-var AllConfigFiles []*ConfigFile

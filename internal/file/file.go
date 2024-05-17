@@ -5,17 +5,57 @@ Code file
 package file
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/92hackers/code-talks/internal"
 )
 
-type CodeFile internal.CodeFile
+// File types
+const (
+	CODE_FILE = iota
+	CONFIG_FILE
+)
+
+type FileMetadata struct {
+	// File metadata
+	Name           string `json:"name"`
+	Path           string `json:"path"`
+	Directory      string `json:"directory"`
+	FileType       uint8  `json:"file_type"`
+	LastModifiedAt uint64 `json:"last_modified_at"`
+}
+
+type FileContent struct {
+	Size    uint64 `json:"size"`
+	Content string `json:"content"`
+}
+
+type CodeFile struct {
+	FileMetadata
+	FileContent
+
+	// Cloc data
+	CodeCount    uint32 `json:"code"`
+	CommentCount uint32 `json:"comment_count"`
+	BlankCount   uint32 `json:"blank_count"`
+	TotalLines   uint32 `json:"total_lines"`
+
+	// Code language
+	Language string `json:"language"`
+}
+
+var AllCodeFiles = []*CodeFile{}
+
+type ConfigFile struct {
+	FileMetadata
+	FileContent
+}
+
+var AllConfigFiles = []*ConfigFile{}
 
 // NewFile creates a new CodeFile
-func NewCodeFile(path string) *CodeFile {
+func NewCodeFile(path string) (*CodeFile, error) {
 	if filepath.IsAbs(path) == false {
 		path, _ = filepath.Abs(path)
 	}
@@ -28,8 +68,7 @@ func NewCodeFile(path string) *CodeFile {
 	fileInfo, err := os.Stat(path)
 
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		return nil, err
 	}
 
 	codeFile := &CodeFile{
@@ -47,25 +86,24 @@ func NewCodeFile(path string) *CodeFile {
 		CodeCount:    0,
 		CommentCount: 0,
 		BlankCount:   0,
-    TotalLines:   0,
-		Language:     internal.SupportedLanguages[fileExt],
+		TotalLines:   0,
+		Language:     internal.SupportedLanguages[fileExt].Name,
 	}
 
 	// Store the code file
-	internal.AllCodeFiles = append(internal.AllCodeFiles, codeFile)
+	AllCodeFiles = append(AllCodeFiles, codeFile)
 
-	return codeFile
+	return codeFile, nil
 }
 
-func (f *CodeFile) Analyze() *CodeFile {
+func (f *CodeFile) Analyze() (*CodeFile, error) {
 	content, err := os.ReadFile(f.Path)
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		return nil, err
 	}
 
 	f.Content = string(content)
 	f.Size = uint64(len(content))
 
-	return f
+	return f, nil
 }

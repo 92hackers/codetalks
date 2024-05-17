@@ -12,6 +12,10 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
+
+	"github.com/92hackers/code-talks/internal"
+	"github.com/92hackers/code-talks/internal/file"
+	"github.com/92hackers/code-talks/internal/language"
 )
 
 func isVCSDir(path string) bool {
@@ -29,22 +33,39 @@ func handler(path string, d fs.DirEntry, err error) error {
 		return err
 	}
 
+	leaf := filepath.Base(path)
+
 	// dir
 	if d.IsDir() {
-		fmt.Println("dir:", path)
-
-		// TODO: Skip specified-ignored directories
 		// Skip VCS directories
-		_, dir := filepath.Split(path)
-		if isVCSDir(dir) {
+		if isVCSDir(leaf) {
 			return fs.SkipDir
 		}
+
+		// TODO: Skip specified-ignored directories
 
 		return nil
 	}
 
 	// file
-	fmt.Println("file:", path)
+	fmt.Println("Scanning file:", path)
+
+	// Skip unsupported file extensions
+	// TODO: maybe a config file
+	fileExt := filepath.Ext(leaf)
+	if internal.SupportedLanguages[fileExt] == nil {
+		return nil
+	}
+
+	// Create a new code file, skip if error
+	codeFile, err := file.NewCodeFile(path)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
+	// Add the code file to the language
+	language.AddLanguage(fileExt, codeFile)
 
 	return nil
 }
