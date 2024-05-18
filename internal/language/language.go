@@ -114,5 +114,8 @@ func AnalyzeAllLanguages() {
 	}
 
 	wg.Wait()
-	fmt.Println("Analyzed all code files")
+
+	if internal.IsDebugEnabled {
+		fmt.Println("Analyzed all code files")
+	}
 }

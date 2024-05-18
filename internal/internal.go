@@ -78,3 +78,6 @@ var ConfigFiles = map[string]string{
 	"go.mod": "go.mod",
 	"go.sum": "go.sum",
 }
+
+// Debug mode
+var IsDebugEnabled = false

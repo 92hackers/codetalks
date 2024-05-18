@@ -7,7 +7,7 @@ Scanner.
 package scanner
 
 import (
-	// "fmt"
+	"fmt"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -47,11 +47,17 @@ func handler(path string, d fs.DirEntry, err error) error {
 		return nil
 	}
 
+	// TODO: handle config file
+
 	// Skip unsupported file extensions
-	// TODO: maybe a config file
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
 		return nil
+	}
+
+	// debug
+	if internal.IsDebugEnabled {
+		fmt.Println("Scanning file", path)
 	}
 
 	// Create a new code file, skip if error
