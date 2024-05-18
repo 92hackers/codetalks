@@ -32,8 +32,10 @@ type Language struct {
 }
 
 // All programming language types detected by codetalks.
-// { language-name: Language }
-var AllLanguagesMap = map[string]*Language{}
+var AllLanguages = []*Language{}
+
+// { language-name: Language-index in AllLanguages list }
+var AllLanguagesMap = map[string]uint{}
 
 func NewLanguage(fileExtension string) *Language {
 	language := &Language{
@@ -46,7 +48,8 @@ func NewLanguage(fileExtension string) *Language {
 		FileCount:     0,
 	}
 
-	AllLanguagesMap[language.Name] = language
+	AllLanguages = append(AllLanguages, language)
+	AllLanguagesMap[language.Name] = uint(len(AllLanguages) - 1)
 
 	return language
 }
@@ -66,8 +69,11 @@ func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
 }
 
 func GetLanguage(fileExtension string) *Language {
+	if len(AllLanguages) == 0 {
+		return nil
+	}
 	name := internal.SupportedLanguages[fileExtension].Name
-	return AllLanguagesMap[name]
+	return AllLanguages[AllLanguagesMap[name]]
 }
 
 func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
@@ -80,7 +86,7 @@ func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
 }
 
 func AnalyzeAllLanguagesSlow() {
-	for _, language := range AllLanguagesMap {
+	for _, language := range AllLanguages {
 		for _, codeFile := range language.CodeFiles {
 			f, err := codeFile.Analyze()
 			if err != nil {
@@ -97,7 +103,7 @@ func AnalyzeAllLanguagesSlow() {
 func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
 
-	for _, language := range AllLanguagesMap {
+	for _, language := range AllLanguages {
 		for _, codeFile := range language.CodeFiles {
 			wg.Add(1)
 			go func(codeFile *file.CodeFile) {

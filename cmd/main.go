@@ -16,9 +16,9 @@ import (
 	"github.com/92hackers/code-talks/internal"
 	"github.com/92hackers/code-talks/internal/file"
 	"github.com/92hackers/code-talks/internal/language"
+	"github.com/92hackers/code-talks/internal/output"
 	"github.com/92hackers/code-talks/internal/scanner"
 	"github.com/92hackers/code-talks/internal/utils"
-	// "github.com/92hackers/code-talks/internal/output"
 )
 
 type cliOptions struct {
@@ -29,7 +29,7 @@ type cliOptions struct {
 func parseOptions() *cliOptions {
 	// Cli flags processing
 	isPrintVersion := flag.Bool("version", false, "Print the version of the code-talks")
-	outputFormat := flag.String("output", "table", "Output format of the code-talks")
+	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the code-talks")
 	isDebug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
@@ -105,26 +105,29 @@ func main() {
 	// Slow version
 	// utils.TimeIt(language.AnalyzeAllLanguagesSlow)
 
-	for k, v := range language.AllLanguagesMap {
-		fmt.Println(k, ": ")
+	// Output the result
+	output.Output(cliOptions.outputFormat)
 
-		// Stats for every language.
-		fmt.Println("FileCount: ", v.FileCount)
-		fmt.Println("TotalLines: ", v.TotalLines)
-		fmt.Println("CodeCount: ", v.CodeCount)
-		fmt.Println("CommentCount: ", v.CommentCount)
-		fmt.Println("BlankCount: ", v.BlankCount)
-		fmt.Println("-=-=-=-=-=-=-")
-
-		// Stats for every file.
-		// for _, codeFile := range v.CodeFiles {
-		// 	fmt.Print(codeFile.Path, " ")
-		// 	fmt.Println("File size: ", codeFile.Size)
-		// 	fmt.Println("TotalLines: ", codeFile.TotalLines)
-		// 	fmt.Println("CodeCount: ", codeFile.CodeCount)
-		// 	fmt.Println("CommentCount: ", codeFile.CommentCount)
-		// 	fmt.Println("BlankCount: ", codeFile.BlankCount)
-		// 	fmt.Println("-=-=-=-=-=-=-")
-		// }
-	}
+	// for k, v := range language.AllLanguagesMap {
+	// 	fmt.Println(k, ": ")
+	//
+	// 	// Stats for every language.
+	// 	fmt.Println("FileCount: ", v.FileCount)
+	// 	fmt.Println("TotalLines: ", v.TotalLines)
+	// 	fmt.Println("CodeCount: ", v.CodeCount)
+	// 	fmt.Println("CommentCount: ", v.CommentCount)
+	// 	fmt.Println("BlankCount: ", v.BlankCount)
+	// 	fmt.Println("-=-=-=-=-=-=-")
+	//
+	// 	// Stats for every file.
+	// 	// for _, codeFile := range v.CodeFiles {
+	// 	// 	fmt.Print(codeFile.Path, " ")
+	// 	// 	fmt.Println("File size: ", codeFile.Size)
+	// 	// 	fmt.Println("TotalLines: ", codeFile.TotalLines)
+	// 	// 	fmt.Println("CodeCount: ", codeFile.CodeCount)
+	// 	// 	fmt.Println("CommentCount: ", codeFile.CommentCount)
+	// 	// 	fmt.Println("BlankCount: ", codeFile.BlankCount)
+	// 	// 	fmt.Println("-=-=-=-=-=-=-")
+	// 	// }
+	// }
 }

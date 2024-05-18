@@ -8,6 +8,7 @@ import (
 	"fmt"
 )
 
-func OutputJson(data [][]string) {
+func OutputJson() {
 	// Output as JSON format
+	fmt.Println("Output as JSON format")
 }
