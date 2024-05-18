@@ -93,6 +93,14 @@ func main() {
 
 	for k, v := range language.AllLanguagesMap {
 		fmt.Print(k, ": ")
-		fmt.Println(len(v.CodeFiles))
+		for _, codeFile := range v.CodeFiles {
+			fmt.Print(codeFile.Path, " ")
+			fmt.Println("File size: ", codeFile.Size)
+			fmt.Println("TotalLines: ", codeFile.TotalLines)
+			fmt.Println("CodeCount: ", codeFile.CodeCount)
+			fmt.Println("CommentCount: ", codeFile.CommentCount)
+			fmt.Println("BlankCount: ", codeFile.BlankCount)
+			fmt.Println("-=-=-=-=-=-=-")
+		}
 	}
 }

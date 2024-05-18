@@ -6,16 +6,16 @@ package internal
 
 // LanguageDefinition represents a programming language definition.
 type LanguageDefinition struct {
-	Name         string     `json:"name"`
-	lineComment  []string   `json:"line_comment"`
-	blockComment [][]string `json:"block_comment"`
+	Name          string     `json:"name"`
+	LineComments  []string   `json:"line_comment"`
+	BlockComments [][]string `json:"block_comment"`
 }
 
-func newLangDef(name string, lineComment []string, blockComment [][]string) *LanguageDefinition {
+func newLangDef(name string, lineComments []string, blockComments [][]string) *LanguageDefinition {
 	return &LanguageDefinition{
-		Name:         name,
-		lineComment:  lineComment,
-		blockComment: blockComment,
+		Name:          name,
+		LineComments:  lineComments,
+		BlockComments: blockComments,
 	}
 }
 

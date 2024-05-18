@@ -47,9 +47,6 @@ func handler(path string, d fs.DirEntry, err error) error {
 		return nil
 	}
 
-	// file
-	// fmt.Println("Scanning file:", path)
-
 	// Skip unsupported file extensions
 	// TODO: maybe a config file
 	fileExt := filepath.Ext(leaf)

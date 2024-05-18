@@ -8,6 +8,7 @@ package language
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/92hackers/code-talks/internal"
@@ -103,6 +104,7 @@ func AnalyzeAllLanguages() {
 				// TODO: Add error handling, handle timeout, and cancelation, maybe by <-done channell.
 				f, err := codeFile.Analyze()
 				if err != nil {
+					log.Println(err) // Log error and continue.
 					return
 				}
 				language.CountCodeFileStats(f)
