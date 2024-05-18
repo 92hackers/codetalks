@@ -9,7 +9,6 @@ package language
 import (
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/92hackers/code-talks/internal"
 	"github.com/92hackers/code-talks/internal/file"
@@ -52,12 +51,16 @@ func NewLanguage(fileExtension string) *Language {
 }
 
 func (l *Language) AddCodeFile(file *file.CodeFile) *Language {
+	l.FileCount += 1
+	l.CodeFiles = append(l.CodeFiles, file)
+	return l
+}
+
+func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
 	l.CodeCount += file.CodeCount
 	l.CommentCount += file.CommentCount
 	l.BlankCount += file.BlankCount
 	l.TotalLines += file.TotalLines
-	l.FileCount += 1
-	l.CodeFiles = append(l.CodeFiles, file)
 	return l
 }
 
@@ -75,28 +78,23 @@ func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
 	return language
 }
 
-func AnalyzeAllLanguagesSlowWay(fileExtension string) {
-	start := time.Now()
-
+func AnalyzeAllLanguagesSlow() {
 	for _, language := range AllLanguagesMap {
 		for _, codeFile := range language.CodeFiles {
 			f, err := codeFile.Analyze()
 			if err != nil {
 				continue
 			}
-			language.AddCodeFile(f)
+			language.CountCodeFileStats(f)
 		}
 	}
 
 	fmt.Println("Analyzed all code files")
-	fmt.Println("Time taken: ", time.Since(start))
 }
 
 // AnalyzeAllLanguages analyzes all code files and accumulates the data.
 func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
-
-	start := time.Now()
 
 	for _, language := range AllLanguagesMap {
 		for _, codeFile := range language.CodeFiles {
@@ -107,7 +105,7 @@ func AnalyzeAllLanguages() {
 				if err != nil {
 					return
 				}
-				language.AddCodeFile(f)
+				language.CountCodeFileStats(f)
 				wg.Done()
 			}(codeFile)
 		}
@@ -115,5 +113,4 @@ func AnalyzeAllLanguages() {
 
 	wg.Wait()
 	fmt.Println("Analyzed all code files")
-	fmt.Println("Time taken: ", time.Since(start))
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/92hackers/code-talks/internal/file"
 	"github.com/92hackers/code-talks/internal/language"
 	"github.com/92hackers/code-talks/internal/scanner"
+	"github.com/92hackers/code-talks/internal/utils"
 )
 
 type cliOptions struct {
@@ -87,7 +88,8 @@ func main() {
 	fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
 
 	// Analyze code files
-	language.AnalyzeAllLanguages()
+	utils.TimeIt(language.AnalyzeAllLanguages)
+	// utils.TimeIt(language.AnalyzeAllLanguagesSlow)
 
 	for k, v := range language.AllLanguagesMap {
 		fmt.Print(k, ": ")

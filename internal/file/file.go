@@ -61,7 +61,6 @@ func NewCodeFile(path string) (*CodeFile, error) {
 	}
 
 	dir, file := filepath.Split(path)
-
 	fileExt := filepath.Ext(file)
 
 	// Get file stats, Follow symbolic links to get the real file stats
