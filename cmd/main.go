@@ -111,31 +111,8 @@ func main() {
 	}
 
 	// Set the view mode
-	view_mode.SetViewMode(cliOptions.viewMode)
+	// view_mode.SetViewMode(cliOptions.viewMode)
 
 	// Output the result
 	output.Output(cliOptions.outputFormat)
-
-	// for k, v := range language.AllLanguagesMap {
-	// 	fmt.Println(k, ": ")
-	//
-	// 	// Stats for every language.
-	// 	fmt.Println("FileCount: ", v.FileCount)
-	// 	fmt.Println("TotalLines: ", v.TotalLines)
-	// 	fmt.Println("CodeCount: ", v.CodeCount)
-	// 	fmt.Println("CommentCount: ", v.CommentCount)
-	// 	fmt.Println("BlankCount: ", v.BlankCount)
-	// 	fmt.Println("-=-=-=-=-=-=-")
-	//
-	// 	// Stats for every file.
-	// 	// for _, codeFile := range v.CodeFiles {
-	// 	// 	fmt.Print(codeFile.Path, " ")
-	// 	// 	fmt.Println("File size: ", codeFile.Size)
-	// 	// 	fmt.Println("TotalLines: ", codeFile.TotalLines)
-	// 	// 	fmt.Println("CodeCount: ", codeFile.CodeCount)
-	// 	// 	fmt.Println("CommentCount: ", codeFile.CommentCount)
-	// 	// 	fmt.Println("BlankCount: ", codeFile.BlankCount)
-	// 	// 	fmt.Println("-=-=-=-=-=-=-")
-	// 	// }
-	// }
 }

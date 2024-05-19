@@ -31,11 +31,23 @@ type Language struct {
 	CodeFiles []*file.CodeFile
 }
 
+// LanguageAggregateStats represents the aggregate statistics of all programming languages.
+type LanguageAggregateStats struct {
+	TotalFiles   uint32 `json:"total_files"`
+	TotalLines   uint32 `json:"total_lines"`
+	TotalCode    uint32 `json:"total_code"`
+	TotalComment uint32 `json:"total_comment"`
+	TotalBlank   uint32 `json:"total_blank"`
+}
+
 // All programming language types detected by codetalks.
 var AllLanguages []*Language
 
 // { language-name: Language-index in AllLanguages list }
 var AllLanguagesMap = map[string]uint{}
+
+// Aggregate stats for all programming languages.
+var AllLanguageAggregateStats = LanguageAggregateStats{}
 
 func NewLanguage(fileExtension string) *Language {
 	language := &Language{
@@ -88,6 +100,17 @@ func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
 	return language
 }
 
+// Aggregate stats
+func AggreateStats() {
+	for _, language := range AllLanguages {
+		AllLanguageAggregateStats.TotalFiles += language.FileCount
+		AllLanguageAggregateStats.TotalLines += language.TotalLines
+		AllLanguageAggregateStats.TotalCode += language.CodeCount
+		AllLanguageAggregateStats.TotalComment += language.CommentCount
+		AllLanguageAggregateStats.TotalBlank += language.BlankCount
+	}
+}
+
 // AnalyzeAllLanguages analyzes all code files and accumulates the data.
 func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
@@ -109,6 +132,9 @@ func AnalyzeAllLanguages() {
 	}
 
 	wg.Wait()
+
+	// Aggregate
+	AggreateStats()
 
 	if internal.IsDebugEnabled {
 		fmt.Println("Analyzed all code files")

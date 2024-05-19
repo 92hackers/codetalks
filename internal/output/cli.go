@@ -6,25 +6,46 @@ package output
 
 import (
 	"fmt"
-	"github.com/92hackers/code-talks/internal/language"
+	"golang.org/x/text/message"
 	"sort"
+
+	"github.com/92hackers/code-talks/internal/language"
 )
 
+var rowLength = 80
+var tableLine = "==============================================================================="
+var printer = message.NewPrinter(message.MatchLanguage("en"))
+
 func OutputCliTable() {
-	rowLength := 80
-	tableLine := "==============================================================================="
-	tableHeader := "| Language        | Files     | Total      | Comments       | Blanks   | Code      |"
+	renderHeader()
+	renderData()
+	renderFooter()
+}
+
+func renderHeader() {
+	tableHeader := "| Language     | Files     | Total      | Comments   | Blanks    | Code       |"
 
 	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
 	fmt.Printf("%.[2]*[1]s\n", tableHeader, rowLength)
 	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
+}
 
+func renderData() {
 	// Default sort criteria.
 	sortLanguagesByCode()
 
 	for _, lang := range language.AllLanguages {
-		fmt.Printf("| %-15s | %-9d | %-10d | %-14d | %-8d | %-9d |\n", lang.Name, lang.FileCount, lang.TotalLines, lang.CommentCount, lang.BlankCount, lang.CodeCount)
+		printer.Printf("| %-12s | %-9d | %-10d | %-10d | %-9d | %-10d |\n", lang.Name, lang.FileCount, lang.TotalLines, lang.CommentCount, lang.BlankCount, lang.CodeCount)
 	}
+}
+
+func renderFooter() {
+	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
+
+	aggregateStats := language.AllLanguageAggregateStats
+	printer.Printf("| %-12s | %-9d | %-10d | %-10d | %-9d | %-10d |\n", "Total", aggregateStats.TotalFiles, aggregateStats.TotalLines, aggregateStats.TotalComment, aggregateStats.TotalBlank, aggregateStats.TotalCode)
+
+	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
 }
 
 // Sort by total lines of code in descending order
