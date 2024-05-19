@@ -19,18 +19,23 @@ import (
 	"github.com/92hackers/code-talks/internal/output"
 	"github.com/92hackers/code-talks/internal/scanner"
 	"github.com/92hackers/code-talks/internal/utils"
+	"github.com/92hackers/code-talks/internal/view_mode"
 )
 
 type cliOptions struct {
 	isDebug      bool
 	outputFormat string
+	viewMode     string
 }
 
 func parseOptions() *cliOptions {
 	// Cli flags processing
 	isPrintVersion := flag.Bool("version", false, "Print the version of the code-talks")
-	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the code-talks")
 	isDebug := flag.Bool("debug", false, "Enable debug mode")
+	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the code-talks")
+	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the code-talks")
+
+	// Parse the flags
 	flag.Parse()
 
 	if *isPrintVersion {
@@ -41,6 +46,7 @@ func parseOptions() *cliOptions {
 	return &cliOptions{
 		isDebug:      *isDebug,
 		outputFormat: *outputFormat,
+		viewMode:     *viewMode,
 	}
 }
 
@@ -94,6 +100,7 @@ func main() {
 	if internal.IsDebugEnabled {
 		fmt.Println("isDebug: ", cliOptions.isDebug)
 		fmt.Println("output format: ", cliOptions.outputFormat)
+		fmt.Println("view mode: ", cliOptions.viewMode)
 		fmt.Println("rootDir: ", rootDir)
 		fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
 
@@ -102,8 +109,9 @@ func main() {
 	} else {
 		language.AnalyzeAllLanguages()
 	}
-	// Slow version
-	// utils.TimeIt(language.AnalyzeAllLanguagesSlow)
+
+	// Set the view mode
+	view_mode.SetViewMode(cliOptions.viewMode)
 
 	// Output the result
 	output.Output(cliOptions.outputFormat)

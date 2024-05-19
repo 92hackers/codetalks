@@ -32,7 +32,7 @@ type Language struct {
 }
 
 // All programming language types detected by codetalks.
-var AllLanguages = []*Language{}
+var AllLanguages []*Language
 
 // { language-name: Language-index in AllLanguages list }
 var AllLanguagesMap = map[string]uint{}
@@ -73,6 +73,9 @@ func GetLanguage(fileExtension string) *Language {
 		return nil
 	}
 	name := internal.SupportedLanguages[fileExtension].Name
+	if _, ok := AllLanguagesMap[name]; !ok {
+		return nil
+	}
 	return AllLanguages[AllLanguagesMap[name]]
 }
 
@@ -83,20 +86,6 @@ func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
 	}
 	language.AddCodeFile(file)
 	return language
-}
-
-func AnalyzeAllLanguagesSlow() {
-	for _, language := range AllLanguages {
-		for _, codeFile := range language.CodeFiles {
-			f, err := codeFile.Analyze()
-			if err != nil {
-				continue
-			}
-			language.CountCodeFileStats(f)
-		}
-	}
-
-	fmt.Println("Analyzed all code files")
 }
 
 // AnalyzeAllLanguages analyzes all code files and accumulates the data.
