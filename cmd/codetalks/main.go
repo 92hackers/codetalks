@@ -23,6 +23,8 @@ import (
 	"github.com/92hackers/code-talks/internal/view_mode"
 )
 
+const Version = "0.1"
+
 type cliOptions struct {
 	isDebug      bool
 	isProfile    bool
@@ -43,7 +45,7 @@ func parseOptions() *cliOptions {
 	flag.Parse()
 
 	if *isPrintVersion {
-		fmt.Println("CodeTalks v0.1")
+		fmt.Println("CodeTalks v" + Version)
 		return nil
 	}
 
@@ -92,6 +94,9 @@ func getRootDir() string {
 func main() {
 	// Parse the cli options
 	cliOptions := parseOptions()
+	if cliOptions == nil {
+		os.Exit(0)
+	}
 
 	// Set the debug flag
 	internal.IsDebugEnabled = cliOptions.isDebug
