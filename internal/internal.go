@@ -51,6 +51,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".toml":  newLangDef("TOML", []string{"#"}, [][]string{{"", ""}}),
 	".md":    newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
 	".txt":   newLangDef("Plain Text", []string{}, [][]string{{"", ""}}),
+	".s":     newLangDef("Assembly", []string{"//"}, [][]string{{"/*", "*/"}}),
 }
 
 // Config files, map as file name -> file label.

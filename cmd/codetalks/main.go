@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/92hackers/code-talks/internal"
 	"github.com/92hackers/code-talks/internal/file"
@@ -24,6 +25,7 @@ import (
 
 type cliOptions struct {
 	isDebug      bool
+	isProfile    bool
 	outputFormat string
 	viewMode     string
 }
@@ -32,6 +34,8 @@ func parseOptions() *cliOptions {
 	// Cli flags processing
 	isPrintVersion := flag.Bool("version", false, "Print the version of the code-talks")
 	isDebug := flag.Bool("debug", false, "Enable debug mode")
+	isProfile := flag.Bool("profile", false, "Enable profile mode")
+
 	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the code-talks")
 	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the code-talks")
 
@@ -45,6 +49,7 @@ func parseOptions() *cliOptions {
 
 	return &cliOptions{
 		isDebug:      *isDebug,
+		isProfile:    *isProfile,
 		outputFormat: *outputFormat,
 		viewMode:     *viewMode,
 	}
@@ -93,6 +98,25 @@ func main() {
 
 	// Get the root directory
 	rootDir := getRootDir()
+
+	// Record the time consumed
+	start := time.Now()
+	defer func() {
+		fmt.Println("Analyze Time consumed: ", time.Since(start))
+	}()
+
+	// Profile the code
+	if cliOptions.isProfile {
+		if cpuDone := utils.StartCPUProfile(); cpuDone != nil {
+			defer cpuDone()
+		}
+		if memDone := utils.StartMemoryProfile(); memDone != nil {
+			defer memDone()
+		}
+		if traceDone := utils.StartTrace(); traceDone != nil {
+			defer traceDone()
+		}
+	}
 
 	// Scan root directory
 	scanner.Scan(rootDir)

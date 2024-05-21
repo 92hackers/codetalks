@@ -160,7 +160,7 @@ scannerFor:
 			}
 		}
 
-		// Currently, nested block comments are not supported.
+		// Currently, nested block comments are not parsed..
 
 		// Block comment begin
 		for _, comment := range langDefinition.BlockComments {
