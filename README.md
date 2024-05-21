@@ -17,8 +17,11 @@ go install github.com/92hackers/code-talks@latest
 ```bash
 cd /path/to/your/project
 
-# Analyze the whole project
+# Analyze whole codebase
 codetalks
+
+# Also, you can analyze a specific directory
+codetalks ./path/to/your/project
 ```
 
 ## Features overview
