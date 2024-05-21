@@ -102,7 +102,7 @@ func main() {
 	// Record the time consumed
 	start := time.Now()
 	defer func() {
-		fmt.Println("Analyze Time consumed: ", time.Since(start))
+		fmt.Println("Analyze time consumed: ", time.Since(start))
 	}()
 
 	// Profile the code
