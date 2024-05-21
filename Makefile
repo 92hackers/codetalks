@@ -1,4 +1,4 @@
-.PHONY: build test
+.PHONY: build test install
 
 build:
 	@echo "Building..."
@@ -8,3 +8,7 @@ build:
 test:
 	@echo "Testing..."
 	@go test -v ./...
+
+install:
+	@echo "Installing..."
+	@go install ./cmd/...
