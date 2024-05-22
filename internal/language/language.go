@@ -118,16 +118,16 @@ func AnalyzeAllLanguages() {
 	for _, language := range AllLanguages {
 		for _, codeFile := range language.CodeFiles {
 			wg.Add(1)
-			go func(codeFile *file.CodeFile) {
+			go func(lang *Language, codeFile *file.CodeFile) {
 				// TODO: Add error handling, handle timeout, and cancelation, maybe by <-done channell.
 				f, err := codeFile.Analyze()
 				if err != nil {
 					log.Println(err) // Log error and continue.
 					return
 				}
-				language.CountCodeFileStats(f)
+				lang.CountCodeFileStats(f)
 				wg.Done()
-			}(codeFile)
+			}(language, codeFile)
 		}
 	}
 
