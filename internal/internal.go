@@ -21,21 +21,27 @@ func newLangDef(name string, lineComments []string, blockComments [][]string) *L
 
 // Supported programming languages, map as file extension -> language name.
 var SupportedLanguages = map[string]*LanguageDefinition{
-	".s":    newLangDef("Assembly", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".c":    newLangDef("C", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".h":    newLangDef("C Header", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".hh":   newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".hpp":  newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".cpp":  newLangDef("C++", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".cs":   newLangDef("C#", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".java": newLangDef("Java", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".rs":   newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".s":   newLangDef("Assembly", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".c":   newLangDef("C", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".h":   newLangDef("C Header", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".hh":  newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".hpp": newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cpp": newLangDef("C++", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cs":  newLangDef("C#", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".rs":  newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".lua": newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
 
 	".js":  newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".mjs": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".cjs": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".ts":  newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".jsx": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 
+	".ts":  newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".mts": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cts": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".tsx": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+
+	".java":  newLangDef("Java", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".php":   newLangDef("PHP", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".py":    newLangDef("Python", []string{"#"}, [][]string{{"\"\"\"", "\"\"\""}}),
 	".pl":    newLangDef("Perl", []string{"#"}, [][]string{{":=", ":=cut"}}),
@@ -47,15 +53,19 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".r":     newLangDef("R", []string{"#"}, [][]string{{"/*", "*/"}}),
 
 	".sh":   newLangDef("Shell", []string{"#"}, [][]string{{"", ""}}),
-	".lua":  newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
+	".zsh":  newLangDef("Shell", []string{"#"}, [][]string{{"", ""}}),
+	".bash": newLangDef("Shell", []string{"#"}, [][]string{{"", ""}}),
+
 	".html": newLangDef("HTML", []string{"<!--", "//"}, [][]string{{"<!--", "-->"}}),
-	".css":  newLangDef("CSS", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".xml":  newLangDef("XML", []string{"<!--"}, [][]string{{"<!--", "-->"}}),
+	".css":  newLangDef("CSS", []string{"//"}, [][]string{{"/*", "*/"}}),
+
 	".json": newLangDef("JSON", []string{}, [][]string{{"", ""}}),
 	".yaml": newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),
 	".toml": newLangDef("TOML", []string{"#"}, [][]string{{"", ""}}),
-	".md":   newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
-	".txt":  newLangDef("Plain Text", []string{}, [][]string{{"", ""}}),
+
+	".md":  newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
+	".txt": newLangDef("Plain Text", []string{}, [][]string{{"", ""}}),
 }
 
 // Config files, map as file name -> file label.

@@ -52,12 +52,15 @@ func handler(path string, d fs.DirEntry, err error) error {
 	// Skip unsupported file extensions
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
+		if internal.IsDebugEnabled {
+			fmt.Println("❌ Unsupported file type", path)
+		}
 		return nil
 	}
 
 	// debug
 	if internal.IsDebugEnabled {
-		fmt.Println("Scanning file", path)
+		fmt.Println("Add new file", path)
 	}
 
 	// Create a new code file, skip if error
