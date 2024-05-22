@@ -9,7 +9,7 @@ Please make sure you have installed Go 1.18+.
 ### Installation
 
 ```bash
-go install github.com/92hackers/code-talks@latest
+go install github.com/92hackers/codetalks@latest
 ```
 
 ### Usage

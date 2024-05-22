@@ -13,9 +13,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/92hackers/code-talks/internal"
-	"github.com/92hackers/code-talks/internal/file"
-	"github.com/92hackers/code-talks/internal/language"
+	"github.com/92hackers/codetalks/internal"
+	"github.com/92hackers/codetalks/internal/file"
+	"github.com/92hackers/codetalks/internal/language"
 )
 
 func isVCSDir(path string) bool {

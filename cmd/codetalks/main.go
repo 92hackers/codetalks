@@ -14,13 +14,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/92hackers/code-talks/internal"
-	"github.com/92hackers/code-talks/internal/file"
-	"github.com/92hackers/code-talks/internal/language"
-	"github.com/92hackers/code-talks/internal/output"
-	"github.com/92hackers/code-talks/internal/scanner"
-	"github.com/92hackers/code-talks/internal/utils"
-	"github.com/92hackers/code-talks/internal/view_mode"
+	"github.com/92hackers/codetalks/internal"
+	"github.com/92hackers/codetalks/internal/file"
+	"github.com/92hackers/codetalks/internal/language"
+	"github.com/92hackers/codetalks/internal/output"
+	"github.com/92hackers/codetalks/internal/scanner"
+	"github.com/92hackers/codetalks/internal/utils"
+	"github.com/92hackers/codetalks/internal/view_mode"
 )
 
 const Version = "0.1"
@@ -34,12 +34,12 @@ type cliOptions struct {
 
 func parseOptions() *cliOptions {
 	// Cli flags processing
-	isPrintVersion := flag.Bool("version", false, "Print the version of the code-talks")
+	isPrintVersion := flag.Bool("version", false, "Print the version of the codetalks")
 	isDebug := flag.Bool("debug", false, "Enable debug mode")
 	isProfile := flag.Bool("profile", false, "Enable profile mode")
 
-	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the code-talks")
-	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the code-talks")
+	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the codetalks")
+	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the codetalks")
 
 	// Parse the flags
 	flag.Parse()

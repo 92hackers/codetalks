@@ -9,7 +9,7 @@ import (
 	"golang.org/x/text/message"
 	"sort"
 
-	"github.com/92hackers/code-talks/internal/language"
+	"github.com/92hackers/codetalks/internal/language"
 )
 
 var rowLength = 80

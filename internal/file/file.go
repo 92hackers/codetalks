@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/92hackers/code-talks/internal"
+	"github.com/92hackers/codetalks/internal"
 )
 
 // File types

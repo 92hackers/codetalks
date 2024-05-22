@@ -11,8 +11,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/92hackers/code-talks/internal"
-	"github.com/92hackers/code-talks/internal/file"
+	"github.com/92hackers/codetalks/internal"
+	"github.com/92hackers/codetalks/internal/file"
 )
 
 // Language represents a programming language.
