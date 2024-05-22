@@ -1,4 +1,4 @@
-# Code-talks
+# Codetalks
 
 A tool that helps analyze your codebase, make it self-talk!
 
