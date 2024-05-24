@@ -14,19 +14,21 @@ import (
 )
 
 // File types
+type FileType uint8
+
 const (
-	CODE_FILE = iota
+	CODE_FILE FileType = iota // Code file
 	CONFIG_FILE
 )
 
 type FileMetadata struct {
 	// File metadata
-	Name           string `json:"name"`
-	Path           string `json:"path"`
-	Directory      string `json:"directory"`
-	FileType       uint8  `json:"file_type"`
-	FileExtension  string `json:"file_extension"`
-	LastModifiedAt uint64 `json:"last_modified_at"`
+	Name           string   `json:"name"`
+	Path           string   `json:"path"`
+	Directory      string   `json:"directory"`
+	FileType       FileType `json:"file_type"`
+	FileExtension  string   `json:"file_extension"`
+	LastModifiedAt uint64   `json:"last_modified_at"`
 }
 
 type FileContent struct {
@@ -82,15 +84,7 @@ func NewCodeFile(path string) (*CodeFile, error) {
 			FileExtension:  fileExt,
 			LastModifiedAt: uint64(fileInfo.ModTime().Unix()),
 		},
-		FileContent: FileContent{
-			Size:    0,
-			Content: "",
-		},
-		CodeCount:    0,
-		CommentCount: 0,
-		BlankCount:   0,
-		TotalLines:   0,
-		Language:     internal.SupportedLanguages[fileExt].Name,
+		Language: internal.SupportedLanguages[fileExt].Name,
 	}
 
 	// Store the code file

@@ -11,6 +11,8 @@ import (
 	"runtime/trace"
 )
 
+// You can view the cpu profile file with `go tool pprof codetalks-cpu.prof`
+// or visualize it on website like https://www.speedscope.app/
 func StartCPUProfile() func() {
 	f, err := os.Create("codetalks-cpu.prof")
 	if err != nil {
@@ -24,6 +26,7 @@ func StartCPUProfile() func() {
 	}
 }
 
+// You can view the trace file with `go tool trace codetalks-trace.prof`
 func StartTrace() func() {
 	f, err := os.Create("codetalks-trace.prof")
 	if err != nil {
@@ -37,6 +40,8 @@ func StartTrace() func() {
 	}
 }
 
+// You can view the memory profile file with `go tool pprof codetalks-mem.prof`
+// or visualize it on website like https://www.speedscope.app/
 func StartMemoryProfile() func() {
 	f, err := os.Create("codetalks-mem.prof")
 	if err != nil {

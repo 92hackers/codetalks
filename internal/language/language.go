@@ -53,11 +53,6 @@ func NewLanguage(fileExtension string) *Language {
 	language := &Language{
 		Name:          internal.SupportedLanguages[fileExtension].Name,
 		FileExtension: fileExtension,
-		CodeCount:     0,
-		CommentCount:  0,
-		BlankCount:    0,
-		TotalLines:    0,
-		FileCount:     0,
 	}
 
 	AllLanguages = append(AllLanguages, language)
