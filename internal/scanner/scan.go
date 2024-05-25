@@ -16,7 +16,10 @@ import (
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
 	"github.com/92hackers/codetalks/internal/language"
+	"github.com/92hackers/codetalks/internal/utils"
 )
+
+var uniqueDirSet *utils.Set
 
 func isVCSDir(path string) bool {
 	vcsDirs := []string{".git", ".svn", ".hg", ".bzr", ".cvs"}
@@ -58,9 +61,14 @@ func handler(path string, d fs.DirEntry, err error) error {
 		return nil
 	}
 
+	// Duplicate directory check
+	if uniqueDirSet.Contains(path) {
+		return nil
+	}
+
 	// debug
 	if internal.IsDebugEnabled {
-		fmt.Println("Add new file", path)
+		fmt.Println("Add new file: ", path)
 	}
 
 	// Create a new code file, skip if error
@@ -73,13 +81,21 @@ func handler(path string, d fs.DirEntry, err error) error {
 	// Add the code file to the language
 	language.AddLanguage(fileExt, codeFile)
 
+	// Add the directory to the unique directory set
+	uniqueDirSet.Add(path)
+
 	return nil
 }
 
-func Scan(dir string) {
-	// Scan directory
-	err := filepath.WalkDir(dir, handler)
-	if err != nil {
-		log.Fatal(err)
+func Scan(rootDirs []string) {
+	// Initialize the unique directory set
+	uniqueDirSet = utils.NewSet()
+
+	for _, dir := range rootDirs {
+		// Scan directory
+		err := filepath.WalkDir(dir, handler)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

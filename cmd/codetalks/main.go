@@ -57,19 +57,32 @@ func parseOptions() *cliOptions {
 	}
 }
 
-func getRootDir() string {
+func getRootDirs() []string {
 	workingDir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rootDir := workingDir
-
 	cliArgs := flag.Args()
-	if len(cliArgs) > 0 {
-		dir := cliArgs[0] // Only support analyzing one directory currently.
-		if rootDir, err = filepath.Abs(dir); err != nil {
-			log.Fatalf("Error getting absolute path of %s", dir)
+
+	if len(cliArgs) == 0 {
+		return []string{workingDir}
+	}
+
+	var rootDirs []string
+	uniqueDirSet := utils.NewSet()
+
+	// Multiple directories can be provided
+	for _, dir := range cliArgs {
+		rootDir, err := filepath.Abs(dir)
+		if err != nil {
+			log.Fatalf("Error getting absolute path of: %s", dir)
+		}
+
+		// TODO: remove subdirectory of another directory.
+		// Duplicate check
+		if uniqueDirSet.Contains(rootDir) {
+			continue
 		}
 
 		// Check if the directory exists
@@ -83,12 +96,16 @@ func getRootDir() string {
 			log.Fatalf("Error accessing directory %s", rootDir)
 		}
 
+		// TODO: Support file.
 		if !dirInfo.IsDir() {
 			log.Fatalf("%s is not a directory, only directory supported now.", rootDir)
 		}
+
+		rootDirs = append(rootDirs, rootDir)
+		uniqueDirSet.Add(rootDir)
 	}
 
-	return rootDir
+	return rootDirs
 }
 
 func main() {
@@ -101,8 +118,8 @@ func main() {
 	// Set the debug flag
 	internal.IsDebugEnabled = cliOptions.isDebug
 
-	// Get the root directory
-	rootDir := getRootDir()
+	// Get the root directories
+	rootDirs := getRootDirs()
 
 	// Record the time consumed
 	start := time.Now()
@@ -123,14 +140,14 @@ func main() {
 		}
 	}
 
-	// Scan root directory
-	scanner.Scan(rootDir)
+	// Scan root directories
+	scanner.Scan(rootDirs)
 
 	if internal.IsDebugEnabled {
+		fmt.Println("rootDirs: ", rootDirs)
 		fmt.Println("isDebug: ", cliOptions.isDebug)
 		fmt.Println("output format: ", cliOptions.outputFormat)
 		fmt.Println("view mode: ", cliOptions.viewMode)
-		fmt.Println("rootDir: ", rootDir)
 		fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
 
 		// Analyze code files
