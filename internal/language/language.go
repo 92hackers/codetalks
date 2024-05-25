@@ -109,6 +109,7 @@ func AggreateStats() {
 // AnalyzeAllLanguages analyzes all code files and accumulates the data.
 func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
+	mutex := &sync.Mutex{}
 
 	for _, language := range AllLanguages {
 		for _, codeFile := range language.CodeFiles {
@@ -120,7 +121,12 @@ func AnalyzeAllLanguages() {
 					log.Println(err) // Log error and continue.
 					return
 				}
+
+				// Aggregate stats for the language
+				mutex.Lock()
 				lang.CountCodeFileStats(f)
+				mutex.Unlock()
+
 				wg.Done()
 			}(language, codeFile)
 		}

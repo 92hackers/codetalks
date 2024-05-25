@@ -22,6 +22,7 @@ func newLangDef(name string, lineComments []string, blockComments [][]string) *L
 // Supported programming languages, map as file extension -> language name.
 var SupportedLanguages = map[string]*LanguageDefinition{
 	".s":   newLangDef("Assembly", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".S":   newLangDef("Assembly", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".c":   newLangDef("C", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".h":   newLangDef("C Header", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".hh":  newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
