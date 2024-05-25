@@ -85,8 +85,8 @@ func getRootDirs() []string {
 			continue
 		}
 
-		// Check if the directory exists
-		dirInfo, err := os.Stat(rootDir) // Follow the symbolic link
+		// Check if the directory or file exists
+		_, err = os.Stat(rootDir) // Follow the symbolic link, but WalkDir() does not follow symbolic links.
 		switch {
 		case os.IsNotExist(err):
 			log.Fatalf("Directory %s does not exist", rootDir)
@@ -96,11 +96,7 @@ func getRootDirs() []string {
 			log.Fatalf("Error accessing directory %s", rootDir)
 		}
 
-		// TODO: Support file.
-		if !dirInfo.IsDir() {
-			log.Fatalf("%s is not a directory, only directory supported now.", rootDir)
-		}
-
+		// Files also can be appended to the rootDirs
 		rootDirs = append(rootDirs, rootDir)
 		uniqueDirSet.Add(rootDir)
 	}
