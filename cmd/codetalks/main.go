@@ -104,6 +104,15 @@ func getRootDirs() []string {
 	return rootDirs
 }
 
+func formatDuration(d time.Duration) string {
+	scale := 100 * time.Second
+	// look for the max scale that is smaller than d
+	for scale > d {
+		scale = scale / 10
+	}
+	return d.Round(scale / 100).String()
+}
+
 func main() {
 	// Parse the cli options
 	cliOptions := parseOptions()
@@ -120,7 +129,7 @@ func main() {
 	// Record the time consumed
 	start := time.Now()
 	defer func() {
-		fmt.Println("Analyze time consumed: ", time.Since(start))
+		fmt.Println("Analyze time consumed: ", formatDuration(time.Since(start)))
 	}()
 
 	// Profile the code
