@@ -109,27 +109,31 @@ func AggreateStats() {
 // AnalyzeAllLanguages analyzes all code files and accumulates the data.
 func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
-	mutex := &sync.Mutex{}
 
 	for _, language := range AllLanguages {
+		ch := make(chan *file.CodeFile)
 		for _, codeFile := range language.CodeFiles {
 			wg.Add(1)
-			go func(lang *Language, codeFile *file.CodeFile) {
+			go func(lang *Language, codeFile *file.CodeFile, ch chan<- *file.CodeFile) {
 				// TODO: Add error handling, handle timeout, and cancelation, maybe by <-done channell.
 				f, err := codeFile.Analyze()
 				if err != nil {
 					log.Println(err) // Log error and continue.
 					return
 				}
-
-				// Aggregate stats for the language
-				mutex.Lock()
-				lang.CountCodeFileStats(f)
-				mutex.Unlock()
-
+				ch <- f
 				wg.Done()
-			}(language, codeFile)
+			}(language, codeFile, ch)
 		}
+
+		// Aggregate stats for the language
+		wg.Add(1)
+		go func(language *Language, ch <-chan *file.CodeFile) {
+			for i := 0; i < len(language.CodeFiles); i++ {
+				language.CountCodeFileStats(<-ch)
+			}
+			wg.Done()
+		}(language, ch)
 	}
 
 	wg.Wait()
