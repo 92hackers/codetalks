@@ -21,6 +21,11 @@ import (
 
 var uniqueDirSet *utils.Set
 
+func init() {
+	// Initialize the unique directory set
+  uniqueDirSet = utils.NewSet()
+}
+
 func isVCSDir(path string) bool {
 	vcsDirs := []string{".git", ".svn", ".hg", ".bzr", ".cvs"}
 	for _, dir := range vcsDirs {
@@ -88,9 +93,6 @@ func handler(path string, d fs.DirEntry, err error) error {
 }
 
 func Scan(rootDirs []string) {
-	// Initialize the unique directory set
-	uniqueDirSet = utils.NewSet()
-
 	for _, dir := range rootDirs {
 		// Scan directory
 		err := filepath.WalkDir(dir, handler)
