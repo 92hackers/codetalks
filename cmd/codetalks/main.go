@@ -23,8 +23,6 @@ import (
 	"github.com/92hackers/codetalks/internal/view_mode"
 )
 
-const Version = "0.1"
-
 type cliOptions struct {
 	isDebug      bool
 	isProfile    bool
@@ -45,7 +43,7 @@ func parseOptions() *cliOptions {
 	flag.Parse()
 
 	if *isPrintVersion {
-		fmt.Println("CodeTalks v" + Version)
+		fmt.Println("CodeTalks " + Version)
 		return nil
 	}
 
