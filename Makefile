@@ -1,7 +1,10 @@
-.PHONY: build test install get-version publish help
+.PHONY: build test install publish help
 
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
+
+# Passed as: make release tag=v0.0.1
+tag ?=
 
 all: build
 
@@ -15,13 +18,9 @@ help:
 	@echo "  publish   Publish codetalks to go remote packages index"
 	@echo "  help      Show this help message"
 
-get-version:
-	@echo "Version..."
-	@bash ./scripts/get-version.sh
-
-update-version: get-version
-	@echo "Updating version..."
-	@bash ./scripts/update-go-version.sh
+release:
+	@echo "Release new version..."
+	@bash ./scripts/release.sh $(tag)
 
 build:
 	@echo "Building..."
@@ -32,10 +31,10 @@ test:
 	@echo "Testing..."
 	@go test -v ./...
 
-install: update-version
+install:
 	@echo "Installing..."
 	@go install ./cmd/...
 
-publish: update-version
+publish: release
 	@echo "Publishing to go packages..."
 	GOPROXY=proxy.golang.org go list -m github.com/92hackers/codetalks@$(version)
