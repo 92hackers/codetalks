@@ -1,4 +1,4 @@
-.PHONY: build test install publish help
+.PHONY: build test install publish help release
 
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
@@ -15,6 +15,7 @@ help:
 	@echo "  build     Build codetalks"
 	@echo "  test      Run tests"
 	@echo "  install   Install codetalks"
+	@echo "  release   Release new version"
 	@echo "  publish   Publish codetalks to go remote packages index"
 	@echo "  help      Show this help message"
 

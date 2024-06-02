@@ -1,5 +1,5 @@
 module github.com/92hackers/codetalks
 
-go 1.18
+go 1.22
 
 require golang.org/x/text v0.15.0

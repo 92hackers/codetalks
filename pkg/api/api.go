@@ -12,5 +12,5 @@ import (
 )
 
 func Analyze() {
-	fmt.Println("api init")
+	fmt.Println("Codetalks it is!")
 }

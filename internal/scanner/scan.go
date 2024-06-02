@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"log"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/92hackers/codetalks/internal"
@@ -19,11 +20,34 @@ import (
 	"github.com/92hackers/codetalks/internal/utils"
 )
 
-var uniqueDirSet *utils.Set
+var (
+	uniqueDirSet *utils.Set
+	matchRegex   []*regexp.Regexp
+	ignoreRegex  []*regexp.Regexp
+)
 
 func init() {
 	// Initialize the unique directory set
-  uniqueDirSet = utils.NewSet()
+	uniqueDirSet = utils.NewSet()
+}
+
+func Config(
+	matchRegexStr string,
+	ignoreRegexStr string,
+) {
+	// Match regexs
+	if matchRegexStr != "" {
+		for _, regexStr := range strings.Split(matchRegexStr, " ") {
+			matchRegex = append(matchRegex, regexp.MustCompile(regexStr))
+		}
+	}
+
+	// Ignore regexs
+	if ignoreRegexStr != "" {
+		for _, regexStr := range strings.Split(ignoreRegexStr, " ") {
+			ignoreRegex = append(ignoreRegex, regexp.MustCompile(regexStr))
+		}
+	}
 }
 
 func isVCSDir(path string) bool {
@@ -57,6 +81,24 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// TODO: handle config file
 
+	// Match regex filter
+	{
+		for _, re := range matchRegex {
+			if !re.MatchString(leaf) {
+				return nil
+			}
+		}
+	}
+
+	// Ignore regex filter
+	{
+		for _, re := range ignoreRegex {
+			if re.MatchString(leaf) {
+				return nil
+			}
+		}
+	}
+
 	// Skip unsupported file extensions
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
@@ -73,7 +115,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// debug
 	if internal.IsDebugEnabled {
-		fmt.Println("Add new file: ", path)
+		fmt.Println("Adding new file: ", path)
 	}
 
 	// Create a new code file, skip if error

@@ -28,6 +28,8 @@ type cliOptions struct {
 	isProfile    bool
 	outputFormat string
 	viewMode     string
+	re           string // regular expression
+	ignore       string // ignore regular expression
 }
 
 func parseOptions() *cliOptions {
@@ -38,6 +40,8 @@ func parseOptions() *cliOptions {
 
 	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the codetalks")
 	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the codetalks")
+	re := flag.String("re", "", "Only analyze files or directories that match the regular expression")
+	ignore := flag.String("ignore", "", "Ignore files or directories that match the regular expression")
 
 	// Parse the flags
 	flag.Parse()
@@ -48,6 +52,8 @@ func parseOptions() *cliOptions {
 	}
 
 	return &cliOptions{
+		re:           *re,
+		ignore:       *ignore,
 		isDebug:      *isDebug,
 		isProfile:    *isProfile,
 		outputFormat: *outputFormat,
@@ -144,6 +150,7 @@ func main() {
 	}
 
 	// Scan root directories
+	scanner.Config(cliOptions.re, cliOptions.ignore)
 	scanner.Scan(rootDirs)
 
 	if internal.IsDebugEnabled {
