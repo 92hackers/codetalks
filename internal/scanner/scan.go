@@ -21,9 +21,10 @@ import (
 )
 
 var (
-	uniqueDirSet *utils.Set
-	matchRegex   []*regexp.Regexp
-	ignoreRegex  []*regexp.Regexp
+	uniqueDirSet   *utils.Set
+	matchRegex     []*regexp.Regexp
+	ignoreRegex    []*regexp.Regexp
+	currentRootDir string
 )
 
 func init() {
@@ -81,21 +82,23 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// TODO: handle config file
 
+	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
 	// Match regex filter
-	{
-		for _, re := range matchRegex {
-			if !re.MatchString(leaf) {
-				return nil
+	for _, re := range matchRegex {
+		if !re.MatchString(cutRootDirPath) {
+			if internal.IsDebugEnabled {
+				fmt.Println("Not matched: ", path)
 			}
+			return nil
 		}
 	}
-
 	// Ignore regex filter
-	{
-		for _, re := range ignoreRegex {
-			if re.MatchString(leaf) {
-				return nil
+	for _, re := range ignoreRegex {
+		if re.MatchString(cutRootDirPath) {
+			if internal.IsDebugEnabled {
+				fmt.Println("Ignored: ", path)
 			}
+			return nil
 		}
 	}
 
@@ -103,7 +106,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
 		if internal.IsDebugEnabled {
-			fmt.Println("❌ Unsupported file type", path)
+			fmt.Println("❌ Unsupported file type: ", path)
 		}
 		return nil
 	}
@@ -136,6 +139,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 func Scan(rootDirs []string) {
 	for _, dir := range rootDirs {
+		currentRootDir = dir
 		// Scan directory
 		err := filepath.WalkDir(dir, handler)
 		if err != nil {
