@@ -8,7 +8,11 @@ package scanner
 
 import (
   "testing"
+  "path/filepath"
   "fmt"
+
+	"github.com/92hackers/codetalks/internal/file"
+	"github.com/92hackers/codetalks/internal/language"
 )
 
 func TestInit(t *testing.T) {
@@ -82,3 +86,40 @@ func TestConfig(t *testing.T) {
   }
 }
 
+func TestIsVCSDir(t *testing.T) {
+  if !isVCSDir(".git") {
+    t.Errorf(".git should not be a VCS directory")
+  }
+
+  if !isVCSDir(".svn") {
+    t.Errorf(".svn should be a VCS directory")
+  }
+
+  if !isVCSDir(".hg") {
+    t.Errorf(".hg should be a VCS directory")
+  }
+
+  if !isVCSDir(".bzr") {
+    t.Errorf(".bzr should be a VCS directory")
+  }
+
+  if !isVCSDir(".cvs") {
+    t.Errorf(".cvs should be a VCS directory")
+  }
+}
+
+func TestScanEmptyCodebase(t *testing.T) {
+  codeBase := filepath.Join("..", "..", "testdata/empty")
+  rootDirs := []string{codeBase}
+  Scan(rootDirs)
+  fmt.Println(uniqueDirSet.Len())
+  if uniqueDirSet.Len() != 0 {
+    t.Errorf("Unique dirs set should be empty")
+  }
+  if len(language.AllLanguages) != 0 {
+    t.Errorf("AllLanguages should be empty")
+  }
+  if len(file.AllCodeFiles) != 0 {
+    t.Errorf("AllCodeFiles should be empty")
+  }
+}

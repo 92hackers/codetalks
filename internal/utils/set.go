@@ -46,6 +46,13 @@ func (s *Set) Contains(item string) bool {
 	return ok
 }
 
+// Helper function to get the number of items in the set
+func (s *Set) Len() int {
+  s.mutex.RLock()
+  defer s.mutex.RUnlock()
+  return len(s.m)
+}
+
 // Usage:
 //
 // func main() {
