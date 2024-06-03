@@ -37,14 +37,16 @@ func Config(
 	ignoreRegexStr string,
 ) {
 	// Match regexs
-	if matchRegexStr != "" {
+	matchRegexStr = strings.TrimSpace(matchRegexStr)
+	if len(matchRegexStr) > 0 {
 		for _, regexStr := range strings.Split(matchRegexStr, " ") {
 			matchRegex = append(matchRegex, regexp.MustCompile(regexStr))
 		}
 	}
 
 	// Ignore regexs
-	if ignoreRegexStr != "" {
+	ignoreRegexStr = strings.TrimSpace(ignoreRegexStr)
+	if len(ignoreRegexStr) > 0 {
 		for _, regexStr := range strings.Split(ignoreRegexStr, " ") {
 			ignoreRegex = append(ignoreRegex, regexp.MustCompile(regexStr))
 		}
@@ -82,13 +84,21 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// TODO: handle config file
 
+	// Cut the root directory from the scanned path.
 	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
 	// Match regex filter
-	for _, re := range matchRegex {
-		if !re.MatchString(cutRootDirPath) {
-			if internal.IsDebugEnabled {
-				fmt.Println("Not matched: ", path)
+	{
+		isMatched := false
+		for _, re := range matchRegex {
+			if re.MatchString(cutRootDirPath) {
+				isMatched = true
+				break
 			}
+			if internal.IsDebugEnabled {
+				fmt.Println("Not matched:", path, "with regexp:", re.String())
+			}
+		}
+		if len(matchRegex) > 0 && !isMatched {
 			return nil
 		}
 	}
@@ -96,7 +106,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	for _, re := range ignoreRegex {
 		if re.MatchString(cutRootDirPath) {
 			if internal.IsDebugEnabled {
-				fmt.Println("Ignored: ", path)
+				fmt.Println("Ignored:", path, "with regexp:", re.String())
 			}
 			return nil
 		}
@@ -106,7 +116,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
 		if internal.IsDebugEnabled {
-			fmt.Println("❌ Unsupported file type: ", path)
+			fmt.Println("❌ Unsupported file type:", path)
 		}
 		return nil
 	}
@@ -118,7 +128,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// debug
 	if internal.IsDebugEnabled {
-		fmt.Println("Adding new file: ", path)
+		fmt.Println("Add new file:", path)
 	}
 
 	// Create a new code file, skip if error

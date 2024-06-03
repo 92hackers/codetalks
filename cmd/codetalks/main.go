@@ -154,11 +154,11 @@ func main() {
 	scanner.Scan(rootDirs)
 
 	if internal.IsDebugEnabled {
-		fmt.Println("rootDirs: ", rootDirs)
-		fmt.Println("isDebug: ", cliOptions.isDebug)
-		fmt.Println("output format: ", cliOptions.outputFormat)
-		fmt.Println("view mode: ", cliOptions.viewMode)
-		fmt.Println("AllCodeFiles: ", len(file.AllCodeFiles))
+		fmt.Println("rootDirs:", rootDirs)
+		fmt.Println("isDebug:", cliOptions.isDebug)
+		fmt.Println("output format:", cliOptions.outputFormat)
+		fmt.Println("view mode:", cliOptions.viewMode)
+		fmt.Println("AllCodeFiles:", len(file.AllCodeFiles))
 
 		// Analyze code files
 		utils.TimeIt(language.AnalyzeAllLanguages)
