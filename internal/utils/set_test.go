@@ -20,20 +20,19 @@ func TestSet(t *testing.T) {
   s.Add("cherry")
 
   // Check if an item is in the set
-  if !s.Contains("apple") {
-    t.Errorf("Set should contain apple")
-  }
+  AssertEqual(t, s.Len(), 3)
+
+  AssertEqual(t, s.Contains("apple"), true)
+  AssertEqual(t, s.Contains("banana"), true)
+  AssertEqual(t, s.Contains("cherry"), true)
 
   // Remove an item from the set
   s.Remove("apple")
 
   // Check if an item is in the set
-  if s.Contains("apple") {
-    t.Errorf("Set should not contain apple")
-  }
+  AssertEqual(t, s.Len(), 2)
+  AssertNot(t, s.Contains("apple"), true)
 
   // Check if an item is in the set
-  if s.Contains("strawberry") {
-    t.Errorf("Set should not contain strawberry")
-  }
+  AssertNot(t, s.Contains("strawberry"), true)
 }
