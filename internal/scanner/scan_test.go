@@ -185,3 +185,37 @@ func TestScanSmallCodebaseMatchAndIgnoreOption(t *testing.T) {
 
 	t.Cleanup(clearState)
 }
+
+func TestScanSmallCodebaseDuplicateRootDirs(t *testing.T) {
+	codeBase := filepath.Join("..", "..", "testdata/small")
+	rootDirs := []string{codeBase, codeBase, codeBase}
+
+	Config(" go$ ", ".+.py$  ")
+	utils.AssertEqual(t, len(matchRegex), 1)
+	utils.AssertEqual(t, len(ignoreRegex), 1)
+
+	Scan(rootDirs)
+	utils.AssertEqual(t, uniqueDirSet.Len(), 1)
+	utils.AssertEqual(t, len(language.AllLanguages), 1)
+	utils.AssertEqual(t, len(language.AllLanguagesMap), 1)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 1)
+
+	t.Cleanup(clearState)
+}
+
+func TestScanUnsupportedFiles(t *testing.T) {
+	codeBase := filepath.Join("..", "..", "testdata/unsupported")
+	rootDirs := []string{codeBase}
+
+	Config(" go$ ", ".+.py$  ")
+	utils.AssertEqual(t, len(matchRegex), 1)
+	utils.AssertEqual(t, len(ignoreRegex), 1)
+
+	Scan(rootDirs)
+	utils.AssertEqual(t, uniqueDirSet.Len(), 0)
+	utils.AssertEqual(t, len(language.AllLanguages), 0)
+	utils.AssertEqual(t, len(language.AllLanguagesMap), 0)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 0)
+
+	t.Cleanup(clearState)
+}

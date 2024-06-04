@@ -1,4 +1,4 @@
-.PHONY: build test install publish help release
+.PHONY: build test install publish help release format
 
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
@@ -13,6 +13,7 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  build     Build codetalks"
+	@echo "  format    Format Go code"
 	@echo "  test      Run tests"
 	@echo "  install   Install codetalks"
 	@echo "  release   Release new version"
@@ -22,6 +23,10 @@ help:
 release:
 	@echo "Release new version..."
 	@bash ./scripts/release.sh $(tag)
+
+format:
+	@echo "Formatting..."
+	@go fmt ./...
 
 build:
 	@echo "Building..."
