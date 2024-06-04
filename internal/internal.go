@@ -100,3 +100,21 @@ var ConfigFiles = map[string]string{
 
 // Debug mode
 var IsDebugEnabled = false
+
+// Global options
+// GlobalOptions represents the global options for the codetalks.
+// can be initialized by CLI flags.
+type GlobalOptions struct {
+	MatchRegexp      string
+	IgnoreRegexp     string
+	IsShowMatched    bool
+	IsShowIgnored    bool
+	IsDebugEnabled   bool
+	ViewMode         string
+	OutputFormat     string
+	IsProfileEnabled bool
+	RootDirs         []string
+	Cwd              string
+}
+
+var GlobalOpts *GlobalOptions

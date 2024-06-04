@@ -12,7 +12,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
@@ -24,12 +23,14 @@ import (
 )
 
 type cliOptions struct {
-	isDebug      bool
-	isProfile    bool
-	outputFormat string
-	viewMode     string
-	match        string // regular expression to match
-	ignore       string // regular expression to ignore
+	isDebug       bool
+	isProfile     bool
+	outputFormat  string
+	viewMode      string
+	match         string // regular expression to match
+	isShowMatched bool
+	ignore        string // regular expression to ignore
+	isShowIgnored bool
 }
 
 func parseOptions() *cliOptions {
@@ -40,8 +41,12 @@ func parseOptions() *cliOptions {
 
 	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the codetalks")
 	viewMode := flag.String("view", view_mode.ViewModeOverview, "View mode of the codetalks")
+
 	match := flag.String("match", "", "Only analyze files or directories that match the regular expression")
+	isShowMatched := flag.Bool("show-matched", false, "Show matched files (works with -match option)")
+
 	ignore := flag.String("ignore", "", "Ignore files or directories that match the regular expression")
+	isShowIgnored := flag.Bool("show-ignored", false, "Show ignored files (works with -ignore option)")
 
 	// Parse the flags
 	flag.Parse()
@@ -52,12 +57,33 @@ func parseOptions() *cliOptions {
 	}
 
 	return &cliOptions{
-		match:        *match,
-		ignore:       *ignore,
-		isDebug:      *isDebug,
-		isProfile:    *isProfile,
-		outputFormat: *outputFormat,
-		viewMode:     *viewMode,
+		match:         *match,
+		isShowMatched: *isShowMatched,
+		ignore:        *ignore,
+		isShowIgnored: *isShowIgnored,
+		isDebug:       *isDebug,
+		isProfile:     *isProfile,
+		outputFormat:  *outputFormat,
+		viewMode:      *viewMode,
+	}
+}
+
+func inigGlobalOpts(cliOptions *cliOptions, rootDirs []string) *internal.GlobalOptions {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return &internal.GlobalOptions{
+		MatchRegexp:      cliOptions.match,
+		IgnoreRegexp:     cliOptions.ignore,
+		IsShowMatched:    cliOptions.isShowMatched,
+		IsShowIgnored:    cliOptions.isShowIgnored,
+		IsDebugEnabled:   cliOptions.isDebug,
+		ViewMode:         cliOptions.viewMode,
+		OutputFormat:     cliOptions.outputFormat,
+		IsProfileEnabled: cliOptions.isProfile,
+		RootDirs:         rootDirs,
+		Cwd:              cwd,
 	}
 }
 
@@ -108,15 +134,6 @@ func getRootDirs() []string {
 	return rootDirs
 }
 
-func formatDuration(d time.Duration) string {
-	scale := 100 * time.Second
-	// look for the max scale that is smaller than d
-	for scale > d {
-		scale = scale / 10
-	}
-	return d.Round(scale / 100).String()
-}
-
 func main() {
 	// Parse the cli options
 	cliOptions := parseOptions()
@@ -130,11 +147,11 @@ func main() {
 	// Get the root directories
 	rootDirs := getRootDirs()
 
+	// Initialize global options
+	internal.GlobalOpts = inigGlobalOpts(cliOptions, rootDirs)
+
 	// Record the time consumed
-	start := time.Now()
-	defer func() {
-		fmt.Println("Analyze time consumed: ", formatDuration(time.Since(start)))
-	}()
+	defer utils.AnalyzeTimeConsumed()()
 
 	// Profile the code
 	if cliOptions.isProfile {
@@ -153,14 +170,13 @@ func main() {
 	scanner.Config(cliOptions.match, cliOptions.ignore)
 	scanner.Scan(rootDirs)
 
+	// Analyze code files
 	if internal.IsDebugEnabled {
 		fmt.Println("rootDirs:", rootDirs)
 		fmt.Println("isDebug:", cliOptions.isDebug)
 		fmt.Println("output format:", cliOptions.outputFormat)
 		fmt.Println("view mode:", cliOptions.viewMode)
 		fmt.Println("AllCodeFiles:", len(file.AllCodeFiles))
-
-		// Analyze code files
 		utils.TimeIt(language.AnalyzeAllLanguages)
 	} else {
 		language.AnalyzeAllLanguages()

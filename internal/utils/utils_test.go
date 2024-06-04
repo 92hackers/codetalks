@@ -8,6 +8,7 @@ package utils
 
 import (
 	"testing"
+	"time"
 )
 
 func TestSet(t *testing.T) {
@@ -35,4 +36,27 @@ func TestSet(t *testing.T) {
 
 	// Check if an item is in the set
 	AssertNot(t, s.Contains("strawberry"), true)
+}
+
+func TestTimeIt(t *testing.T) {
+	// TimeIt
+	TimeIt(func() {
+		time.Sleep(100 * time.Millisecond)
+	})
+}
+
+func TestFormatDuration(t *testing.T) {
+	// FormatDuration
+	AssertEqual(t, formatDuration(1), "1ns")
+	AssertEqual(t, formatDuration(1000), "1µs")
+	AssertEqual(t, formatDuration(1000000), "1ms")
+	AssertEqual(t, formatDuration(1000000000), "1s")
+	AssertEqual(t, formatDuration(3578970000), "3.58s")
+	AssertEqual(t, formatDuration(1000000000000), "16m40s")
+}
+
+func TestAnalyzeTimeConsumed(t *testing.T) {
+	// AnalyzeTimeConsumed
+	defer AnalyzeTimeConsumed()()
+	time.Sleep(125 * time.Millisecond)
 }
