@@ -1,0 +1,27 @@
+#! /bin/sh
+#
+# A pre-commit hook to check that all Go files are formatted correctly.
+#
+# Usage: copy this file into the .git/hooks directory of your repository.
+#
+
+# Find all go files
+go_files=$(git diff --cached --diff-filter=ACMR --name-only "*.go" | sed 's| |\\ |g')
+
+# If there are no Go files, exit
+if [ -z "$go_files" ]; then
+  exit 0
+fi
+
+# Format the Go files
+gofmt_output=$(gofmt -l $go_files)
+
+# If gofmt produced any output (i.e., modifications), show the changes and exit with non-zero status
+if [ -n "$gofmt_output" ]; then
+  echo "Go files need formatting. Please run 'go fmt ./...' or alias: 'gofa' to format them and then commit the changes:"
+  echo "$gofmt_output"
+  exit 1
+fi
+
+# If everything is formatted correctly, exit with success
+exit 0
