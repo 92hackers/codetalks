@@ -48,20 +48,20 @@ func (s *Set) Contains(item string) bool {
 
 // Debug purpose: Helper function to get the number of items in the set
 func (s *Set) Len() int {
-  s.mutex.RLock()
-  defer s.mutex.RUnlock()
-  return len(s.m)
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	return len(s.m)
 }
 
 // Debug purpose: Helper function to get all items in the set
 func (s *Set) Items() []string {
-  s.mutex.RLock()
-  defer s.mutex.RUnlock()
-  items := make([]string, 0, len(s.m))
-  for item := range s.m {
-    items = append(items, item)
-  }
-  return items
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	items := make([]string, 0, len(s.m))
+	for item := range s.m {
+		items = append(items, item)
+	}
+	return items
 }
 
 // Usage:

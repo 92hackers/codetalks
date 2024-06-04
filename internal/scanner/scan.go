@@ -25,20 +25,20 @@ var (
 	matchRegex     []*regexp.Regexp
 	ignoreRegex    []*regexp.Regexp
 	currentRootDir string
-  vcsDirs *utils.Set
+	vcsDirs        *utils.Set
 )
 
 func init() {
 	// Initialize the unique directory set
 	uniqueDirSet = utils.NewSet()
-  vcsDirs = utils.NewSet()
-  {
-    vcsDirs.Add(".git")
-    vcsDirs.Add(".svn")
-    vcsDirs.Add(".hg")
-    vcsDirs.Add(".bzr")
-    vcsDirs.Add(".cvs")
-  }
+	vcsDirs = utils.NewSet()
+	{
+		vcsDirs.Add(".git")
+		vcsDirs.Add(".svn")
+		vcsDirs.Add(".hg")
+		vcsDirs.Add(".bzr")
+		vcsDirs.Add(".cvs")
+	}
 }
 
 func Config(
@@ -63,7 +63,7 @@ func Config(
 }
 
 func isVCSDir(path string) bool {
-  return vcsDirs.Contains(path)
+	return vcsDirs.Contains(path)
 }
 
 func handler(path string, d fs.DirEntry, err error) error {
