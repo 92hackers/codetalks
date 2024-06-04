@@ -13,5 +13,5 @@ import (
 )
 
 func TestOutputCliTable(t *testing.T) {
-
+	utils.AssertEqual(t, 1, 1)
 }

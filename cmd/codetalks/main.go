@@ -36,7 +36,7 @@ type cliOptions struct {
 func parseOptions() *cliOptions {
 	// Cli flags processing
 	isPrintVersion := flag.Bool("version", false, "Print the version of the codetalks")
-	isDebug := flag.Bool("debug", false, "Enable debug mode")
+	isDebug := flag.Bool("debug", false, "Enable debug mode (display internal analyze logs)")
 	isProfile := flag.Bool("profile", false, "Enable profile mode")
 
 	outputFormat := flag.String("output", output.OutputFormatTable, "Output format of the codetalks")
@@ -68,6 +68,7 @@ func parseOptions() *cliOptions {
 	}
 }
 
+// Init global options with cli options
 func inigGlobalOpts(cliOptions *cliOptions, rootDirs []string) *internal.GlobalOptions {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -171,7 +172,7 @@ func main() {
 	scanner.Scan(rootDirs)
 
 	// Analyze code files
-	if internal.IsDebugEnabled {
+	if internal.GlobalOpts.IsDebugEnabled {
 		fmt.Println("rootDirs:", rootDirs)
 		fmt.Println("isDebug:", cliOptions.isDebug)
 		fmt.Println("output format:", cliOptions.outputFormat)

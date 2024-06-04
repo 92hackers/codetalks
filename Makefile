@@ -1,4 +1,4 @@
-.PHONY: build test install publish help release format
+.PHONY: build test install publish help release format dev
 
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
@@ -12,6 +12,7 @@ help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
+	@echo "  dev       Init development env"
 	@echo "  build     Build codetalks"
 	@echo "  format    Format Go code"
 	@echo "  test      Run tests"
@@ -23,6 +24,10 @@ help:
 release:
 	@echo "Release new version..."
 	@bash ./scripts/release.sh $(tag)
+
+dev:
+	@echo "Initializing development environment..."
+	@bash ./init-env.sh
 
 format:
 	@echo "Formatting..."

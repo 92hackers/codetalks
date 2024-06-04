@@ -117,4 +117,4 @@ type GlobalOptions struct {
 	Cwd              string
 }
 
-var GlobalOpts *GlobalOptions
+var GlobalOpts = &GlobalOptions{}

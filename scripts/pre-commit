@@ -1,9 +1,24 @@
 #! /bin/sh
 #
-# A pre-commit hook to check that all Go files are formatted correctly.
+# A pre-commit hook to make sure high-quality code being pushed.
+#
+# Tasks:
+# 1. Check if go code has been formatted ?
+# 2. Run `make test` locally.
 #
 # Usage: copy this file into the .git/hooks directory of your repository.
 #
+#
+# ------------- Run Test -------------------------------
+
+make test
+rc=$?
+if [ $rc -ne 0 ]; then
+  echo "Tests failed. Please fix the failing tests and then commit the changes."
+  exit 1
+fi
+
+# ------------- Code Format Check -------------------------------
 
 # Find all go files
 go_files=$(git diff --cached --diff-filter=ACMR --name-only "*.go" | sed 's| |\\ |g')

@@ -95,9 +95,13 @@ func handler(path string, d fs.DirEntry, err error) error {
 		for _, re := range matchRegex {
 			if re.MatchString(cutRootDirPath) {
 				isMatched = true
+				// Log
+				if internal.GlobalOpts.IsDebugEnabled || internal.GlobalOpts.IsShowMatched {
+					fmt.Println("File matched:", path)
+				}
 				break
 			}
-			if internal.IsDebugEnabled {
+			if internal.GlobalOpts.IsDebugEnabled {
 				fmt.Println("Not matched:", path, "with regexp:", re.String())
 			}
 		}
@@ -108,8 +112,8 @@ func handler(path string, d fs.DirEntry, err error) error {
 	// Ignore regex filter
 	for _, re := range ignoreRegex {
 		if re.MatchString(cutRootDirPath) {
-			if internal.IsDebugEnabled {
-				fmt.Println("Ignored:", path, "with regexp:", re.String())
+			if internal.GlobalOpts.IsDebugEnabled || internal.GlobalOpts.IsShowIgnored {
+				fmt.Println("File ignored:", path, "with regexp:", re.String())
 			}
 			return nil
 		}
@@ -118,7 +122,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	// Skip unsupported file extensions
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
-		if internal.IsDebugEnabled {
+		if internal.GlobalOpts.IsDebugEnabled {
 			fmt.Println("❌ Unsupported file type:", path)
 		}
 		return nil
@@ -130,7 +134,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	}
 
 	// debug
-	if internal.IsDebugEnabled {
+	if internal.GlobalOpts.IsDebugEnabled {
 		fmt.Println("Add new file:", path)
 	}
 
