@@ -24,7 +24,6 @@ func OutputCliTable() {
 
 func renderHeader() {
 	tableHeader := "| Language     | Files     | Total      | Comments   | Blanks    | Code       |"
-
 	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
 	fmt.Printf("%.[2]*[1]s\n", tableHeader, rowLength)
 	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
@@ -40,7 +39,9 @@ func renderData() {
 }
 
 func renderFooter() {
-	fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
+	if len(language.AllLanguages) > 0 {
+		fmt.Printf("%.[2]*[1]s\n", tableLine, rowLength)
+	}
 
 	aggregateStats := language.AllLanguageAggregateStats
 	printer.Printf("| %-12s | %-9d | %-10d | %-10d | %-9d | %-10d |\n", "Total", aggregateStats.TotalFiles, aggregateStats.TotalLines, aggregateStats.TotalComment, aggregateStats.TotalBlank, aggregateStats.TotalCode)

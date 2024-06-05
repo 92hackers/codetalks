@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-func OutputJson() {
+func OutputJSON() {
 	// Output as JSON format
 	fmt.Println("Output as JSON format")
 }
