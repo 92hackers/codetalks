@@ -40,9 +40,12 @@ func TestSet(t *testing.T) {
 
 func TestTimeIt(t *testing.T) {
 	// TimeIt
-	TimeIt(func() {
-		time.Sleep(100 * time.Millisecond)
+	timeTakenStr := CaptureStdout(func() {
+		TimeIt(func() {
+			time.Sleep(100 * time.Millisecond)
+		})
 	})
+	AssertEqual(t, timeTakenStr, "Time taken: 100ms\n")
 }
 
 func TestFormatDuration(t *testing.T) {
@@ -57,6 +60,8 @@ func TestFormatDuration(t *testing.T) {
 
 func TestAnalyzeTimeConsumed(t *testing.T) {
 	// AnalyzeTimeConsumed
-	defer AnalyzeTimeConsumed()()
+	fn := AnalyzeTimeConsumed()
 	time.Sleep(125 * time.Millisecond)
+	analyzeTimeConsumedStr := CaptureStdout(fn)
+	AssertEqual(t, analyzeTimeConsumedStr, "Analyze time consumed: 125ms\n")
 }

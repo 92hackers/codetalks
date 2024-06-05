@@ -23,7 +23,7 @@ func formatDuration(d time.Duration) string {
 func TimeIt(fn func()) {
 	start := time.Now()
 	fn()
-	fmt.Println("Time taken: ", formatDuration(time.Since(start)))
+	fmt.Println("Time taken:", formatDuration(time.Since(start)))
 }
 
 // AnalyzeTimeConsumed is a function that returns a function that can be used to analyze the time consumed.
@@ -31,6 +31,6 @@ func TimeIt(fn func()) {
 func AnalyzeTimeConsumed() func() {
 	start := time.Now() // Closure
 	return func() {
-		fmt.Println("Analyze time consumed: ", formatDuration(time.Since(start)))
+		fmt.Println("Analyze time consumed:", formatDuration(time.Since(start)))
 	}
 }
