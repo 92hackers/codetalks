@@ -68,6 +68,7 @@ func (l *Language) AddCodeFile(file *file.CodeFile) *Language {
 }
 
 func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
+	fmt.Println("CountCodeFileStats")
 	l.CodeCount += file.CodeCount
 	l.CommentCount += file.CommentCount
 	l.BlankCount += file.BlankCount
@@ -79,7 +80,11 @@ func GetLanguage(fileExtension string) *Language {
 	if len(AllLanguages) == 0 {
 		return nil
 	}
-	name := internal.SupportedLanguages[fileExtension].Name
+	langDef, ok := internal.SupportedLanguages[fileExtension]
+	if !ok {
+		return nil
+	}
+	name := langDef.Name
 	if _, ok := AllLanguagesMap[name]; !ok {
 		return nil
 	}

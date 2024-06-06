@@ -8,11 +8,14 @@ import (
 	"fmt"
 )
 
-const ViewModeOverview = "overview"
-const ViewModeFiles = "files"
-const ViewModeDirectories = "directories"
-const ViewModeDirectoriesDepth = "directories_depth"
+const (
+	ViewModeOverview         = "overview"
+	ViewModeFiles            = "files"
+	ViewModeDirectories      = "directories"
+	ViewModeDirectoriesDepth = "directories_depth"
+)
 
+// Default view mode: overview, nospecific processing
 func SetViewMode(viewMode string) {
 	fmt.Println("View mode:", viewMode)
 }

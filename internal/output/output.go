@@ -18,6 +18,6 @@ func Output(outputFormat string) {
 	case OutputFormatJSON:
 		OutputJSON()
 	default:
-		OutputCliTable()
+		panic("Valid output formats are: table, json")
 	}
 }
