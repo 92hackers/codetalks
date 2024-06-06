@@ -68,7 +68,6 @@ func (l *Language) AddCodeFile(file *file.CodeFile) *Language {
 }
 
 func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
-	fmt.Println("CountCodeFileStats")
 	l.CodeCount += file.CodeCount
 	l.CommentCount += file.CommentCount
 	l.BlankCount += file.BlankCount
@@ -147,6 +146,6 @@ func AnalyzeAllLanguages() {
 	AggreateStats()
 
 	if internal.IsDebugEnabled {
-		fmt.Println("Analyzed all code files")
+		fmt.Println("All code files analyzed!")
 	}
 }
