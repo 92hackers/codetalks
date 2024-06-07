@@ -33,7 +33,7 @@ version=$new_tag
 echo "Updating new version: $version in go version file: $go_version_file"
 echo "package main" > $go_version_file
 echo "" >> $go_version_file
-echo "const Version=\"$version\"" >> $go_version_file
+echo "const Version = \"$version\"" >> $go_version_file
 
 # 3. git commit the changes.
 git add .
