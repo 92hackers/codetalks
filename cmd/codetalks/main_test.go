@@ -42,12 +42,22 @@ func init() {
 	cwd, _ = os.Getwd()
 }
 
-func TestCMD(t *testing.T) {
-	cmd := exec.Command(filepath.Join(cwd, codeTalksBinary), filepath.Join(cwd, normalCodebase))
+func expectOutputWithCommand(t *testing.T, expected string, args ...string) string {
+	t.Helper()
+	cmd := exec.Command(filepath.Join(cwd, codeTalksBinary), args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Errorf("❌ Error: %s\nOutput: %s\n", err, output)
 	}
+	outputStr := string(output)
+	if !strings.HasPrefix(outputStr, expected) {
+		t.Log("Actual command:", cmd)
+		t.Errorf("❌ Expected %s but got %s", expected, outputStr)
+	}
+	return outputStr
+}
+
+func TestCMD(t *testing.T) {
 	expected := `===============================================================================
 | Language     | Files     | Total      | Comments   | Blanks    | Code       |
 ===============================================================================
@@ -57,15 +67,49 @@ func TestCMD(t *testing.T) {
 | Go           | 2         | 51         | 10         | 10        | 31         |
 | YAML         | 1         | 34         | 3          | 2         | 29         |
 | Markdown     | 1         | 41         | 0          | 15        | 26         |
+| Vue          | 1         | 36         | 9          | 3         | 24         |
 | Shell        | 1         | 45         | 14         | 8         | 23         |
 | C#           | 1         | 26         | 9          | 3         | 14         |
 | Python       | 1         | 15         | 5          | 3         | 7          |
 | Plain Text   | 1         | 1          | 0          | 0         | 1          |
 ===============================================================================
-| Total        | 11        | 357        | 66         | 63        | 228        |
+| Total        | 12        | 393        | 75         | 66        | 252        |
 ===============================================================================
 `
-	if !strings.HasPrefix(string(output), expected) {
-		t.Errorf("❌ Expected %s but got %s", expected, string(output))
-	}
+	expectOutputWithCommand(t, expected, filepath.Join(cwd, normalCodebase))
+}
+
+func TestCMDWithMatchOption(t *testing.T) {
+	expected := `===============================================================================
+| Language     | Files     | Total      | Comments   | Blanks    | Code       |
+===============================================================================
+| Rust         | 1         | 48         | 10         | 5         | 33         |
+| Go           | 2         | 51         | 10         | 10        | 31         |
+| Python       | 1         | 15         | 5          | 3         | 7          |
+===============================================================================
+| Total        | 4         | 114        | 25         | 18        | 71         |
+===============================================================================
+`
+	codebase := filepath.Join(cwd, normalCodebase)
+	expectOutputWithCommand(t, expected, "-match", ".rs$ .go$ .py$ ", codebase)
+}
+
+func TestCMDWithIgnoreOption(t *testing.T) {
+	expected := `===============================================================================
+| Language     | Files     | Total      | Comments   | Blanks    | Code       |
+===============================================================================
+| C            | 1         | 50         | 9          | 9         | 32         |
+| HTML         | 1         | 46         | 6          | 8         | 32         |
+| YAML         | 1         | 34         | 3          | 2         | 29         |
+| Markdown     | 1         | 41         | 0          | 15        | 26         |
+| Vue          | 1         | 36         | 9          | 3         | 24         |
+| Shell        | 1         | 45         | 14         | 8         | 23         |
+| C#           | 1         | 26         | 9          | 3         | 14         |
+| Plain Text   | 1         | 1          | 0          | 0         | 1          |
+===============================================================================
+| Total        | 8         | 279        | 50         | 48        | 181        |
+===============================================================================
+`
+	codebase := filepath.Join(cwd, normalCodebase)
+	expectOutputWithCommand(t, expected, "-ignore", ".rs$ .go$ .py$ ", codebase)
 }

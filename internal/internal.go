@@ -34,20 +34,23 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".cs":  newLangDef("C#", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".rs":  newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".lua": newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
+	".ml":  newLangDef("OCaml", []string{""}, [][]string{{"(*", "*)"}}),
 
 	".js":  newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".mjs": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".cjs": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".jsx": newLangDef("JavaScript", []string{"//"}, [][]string{{"/*", "*/"}}),
+
+	".jsx": newLangDef("ReactJS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".tsx": newLangDef("ReactJS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".vue": newLangDef("Vue", []string{"//"}, [][]string{{"/*", "*/"}, {"<!--", "-->"}}),
 
 	".ts":  newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".mts": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".cts": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".tsx": newLangDef("TypeScript", []string{"//"}, [][]string{{"/*", "*/"}}),
 
 	".java":  newLangDef("Java", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".php":   newLangDef("PHP", []string{"//"}, [][]string{{"/*", "*/"}}),
-	".py":    newLangDef("Python", []string{"#"}, [][]string{{"\"\"\"", "\"\"\""}}),
+	".py":    newLangDef("Python", []string{"#"}, [][]string{{`"""`, `"""`}}),
 	".pl":    newLangDef("Perl", []string{"#"}, [][]string{{":=", ":=cut"}}),
 	".rb":    newLangDef("Ruby", []string{"#"}, [][]string{{":=begin", ":=end"}}),
 	".swift": newLangDef("Swift", []string{"//"}, [][]string{{"/*", "*/"}}),
@@ -63,6 +66,9 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".html": newLangDef("HTML", []string{"<!--", "//"}, [][]string{{"<!--", "-->"}}),
 	".xml":  newLangDef("XML", []string{"<!--"}, [][]string{{"<!--", "-->"}}),
 	".css":  newLangDef("CSS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".sass": newLangDef("SASS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".scss": newLangDef("SASS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".less": newLangDef("LESS", []string{"//"}, [][]string{{"/*", "*/"}}),
 
 	".json": newLangDef("JSON", []string{}, [][]string{{"", ""}}),
 	".yaml": newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),
