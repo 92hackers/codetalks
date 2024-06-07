@@ -9,16 +9,6 @@
 # Usage: copy this file into the .git/hooks directory of your repository.
 #
 #
-# ------------- Run Test -------------------------------
-
-make test
-rc=$?
-if [ $rc -ne 0 ]; then
-  echo "Tests failed. Please fix the failing tests and then commit the changes."
-  exit 1
-fi
-
-# ------------- Code Format Check -------------------------------
 
 # Find all go files
 go_files=$(git diff --cached --diff-filter=ACMR --name-only "*.go" | sed 's| |\\ |g')
@@ -28,6 +18,16 @@ if [ -z "$go_files" ]; then
   exit 0
 fi
 
+# ------------- Run Test -------------------------------
+make test
+rc=$?
+if [ $rc -ne 0 ]; then
+  echo "Tests failed. Please fix the failing tests and then commit the changes."
+  exit 1
+fi
+
+# ------------- Code Format Check -------------------------------
+#
 # Format the Go files
 gofmt_output=$(gofmt -l $go_files)
 
