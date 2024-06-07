@@ -25,6 +25,12 @@ if [ -z "$new_tag" ]; then
   exit 1
 fi
 
+# Check if tag already existed.
+if $new_tag == $last_tag; then
+  echo "Error: Tag $new_tag already exists."
+  exit 0
+fi
+
 # 1. Update the version in the version.txt file.
 printf $new_tag > $version_file
 
