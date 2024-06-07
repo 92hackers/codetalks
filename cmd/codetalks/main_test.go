@@ -35,7 +35,7 @@ func execCommand(command string, args ...string) (string, error) {
 
 func init() {
 	os.Chdir(filepath.Join("..", ".."))
-	_, err := execCommand("make", "build") // Build codetaalks binary
+	_, err := execCommand("make", "build") // Build codetalks binary
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func expectOutputWithCommand(t *testing.T, expected string, args ...string) stri
 		t.Errorf("❌ Error: %s\nOutput: %s\n", err, output)
 	}
 	outputStr := string(output)
-	if !strings.HasPrefix(outputStr, expected) {
+	if !strings.Contains(outputStr, expected) {
 		t.Log("Actual command:", cmd)
 		t.Errorf("❌ Expected %s but got %s", expected, outputStr)
 	}
@@ -92,6 +92,14 @@ func TestCMDWithMatchOption(t *testing.T) {
 `
 	codebase := filepath.Join(cwd, normalCodebase)
 	expectOutputWithCommand(t, expected, "-match", ".rs$ .go$ .py$ ", codebase)
+
+	t.Run("TestCMDWithMatchedShowed", func(t *testing.T) {
+		output := expectOutputWithCommand(t, expected, "-match", ".rs$ .go$ .py$ ", "--show-matched", codebase)
+		matchStr := "File matched"
+		if !strings.HasPrefix(output, matchStr) {
+			t.Errorf("❌ %s not found in %s", matchStr, output)
+		}
+	})
 }
 
 func TestCMDWithIgnoreOption(t *testing.T) {
@@ -112,4 +120,12 @@ func TestCMDWithIgnoreOption(t *testing.T) {
 `
 	codebase := filepath.Join(cwd, normalCodebase)
 	expectOutputWithCommand(t, expected, "-ignore", ".rs$ .go$ .py$ ", codebase)
+
+	t.Run("TestCMDWithIgnoredShowed", func(t *testing.T) {
+		output := expectOutputWithCommand(t, expected, "-ignore", ".rs$ .go$ .py$ ", "--show-ignored", codebase)
+		matchStr := "File ignored"
+		if !strings.HasPrefix(output, matchStr) {
+			t.Errorf("❌ %s not found in %s", matchStr, output)
+		}
+	})
 }
