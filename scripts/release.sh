@@ -26,8 +26,8 @@ if [ -z "$new_tag" ]; then
 fi
 
 # Check if tag already existed.
-if $new_tag == $last_tag; then
-  echo "Error: Tag $new_tag already exists."
+if [ $new_tag == $last_tag ]; then
+  echo "Info: Tag '$new_tag' already exists."
   exit 0
 fi
 
