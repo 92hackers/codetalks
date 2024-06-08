@@ -69,6 +69,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".sass": newLangDef("SASS", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".scss": newLangDef("SASS", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".less": newLangDef("LESS", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".svg":  newLangDef("SVG", []string{""}, [][]string{{"<!--", "-->"}}),
 
 	".json": newLangDef("JSON", []string{}, [][]string{{"", ""}}),
 	".yaml": newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),

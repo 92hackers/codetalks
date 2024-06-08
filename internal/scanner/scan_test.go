@@ -261,10 +261,10 @@ func TestScannerRespectGitIgnoreWithMatch(t *testing.T) {
 	Config(" .go$", "")
 	Scan(rootDirs)
 
-	utils.AssertEqual(t, uniqueDirSet.Len(), 2)
+	utils.AssertEqual(t, uniqueDirSet.Len(), 1)
 	utils.AssertEqual(t, len(language.AllLanguages), 1)
 	utils.AssertEqual(t, len(language.AllLanguagesMap), 1)
-	utils.AssertEqual(t, len(file.AllCodeFiles), 2)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 1)
 
 	t.Cleanup(clearState)
 }

@@ -77,6 +77,9 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	leaf := filepath.Base(path)
 
+	// Cut the root directory from the scanned path.
+	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
+
 	// dir
 	if d.IsDir() {
 		// Skip VCS directories
@@ -84,15 +87,21 @@ func handler(path string, d fs.DirEntry, err error) error {
 			return fs.SkipDir
 		}
 
-		// TODO: Skip specified-ignored directories
+		// Skip directories that are ignored by gitignore
+		//
+		// Custom match regular expression has over precedence over gitignore patterns NOT works for directories.
+		// For performance reasons, we skip directories that are ignored by gitignore.
+		// To avoid scanning the files in the ignored directories.
+		// To analyze thus directory, you can specific the directory as one of root directories.
+		//
+		if gi := gitIgnoreMap[currentRootDir]; gi != nil && gi.MatchesPath(cutRootDirPath) {
+			return fs.SkipDir
+		}
 
 		return nil
 	}
 
 	// TODO: handle config file
-
-	// Cut the root directory from the scanned path.
-	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
 
 	// Match regex filter
 	{
