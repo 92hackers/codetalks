@@ -45,10 +45,7 @@ func init() {
 func expectOutputWithCommand(t *testing.T, expected string, args ...string) string {
 	t.Helper()
 	cmd := exec.Command(filepath.Join(cwd, codeTalksBinary), args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Errorf("❌ Error: %s\nOutput: %s\n", err, output)
-	}
+	output, _ := cmd.CombinedOutput()
 	outputStr := string(output)
 	if !strings.Contains(outputStr, expected) {
 		t.Log("Actual command:", cmd)
@@ -128,4 +125,30 @@ func TestCMDWithIgnoreOption(t *testing.T) {
 			t.Errorf("❌ %s not found in %s", matchStr, output)
 		}
 	})
+}
+
+func TestCMDWithInvalidOutputFormat(t *testing.T) {
+	expected := "Valid output formats are: table, json"
+	output := expectOutputWithCommand(t, expected, "-output", "jsonx", "--debug", filepath.Join(cwd, normalCodebase))
+	analyzeTimeStr := "Analyze time consumed"
+	if strings.Contains(output, analyzeTimeStr) {
+		t.Errorf("❌ '%s' should not be found in output: %s", analyzeTimeStr, output)
+	}
+	debugStr := "rootDirs:"
+	if strings.Contains(output, debugStr) {
+		t.Errorf("❌ '%s' should not be found in output: %s", debugStr, output)
+	}
+}
+
+func TestCMDWithInvalidViewMode(t *testing.T) {
+	expected := "Valid view modes are: overview, files, directories"
+	output := expectOutputWithCommand(t, expected, "-view", "invalid", "--debug", filepath.Join(cwd, normalCodebase))
+	analyzeTimeStr := "Analyze time consumed"
+	if strings.Contains(output, analyzeTimeStr) {
+		t.Errorf("❌ '%s' should not be found in output: %s", analyzeTimeStr, output)
+	}
+	debugStr := "rootDirs:"
+	if strings.Contains(output, debugStr) {
+		t.Errorf("❌ '%s' should not be found in output: %s", debugStr, output)
+	}
 }

@@ -56,6 +56,7 @@ func parseOptions() *cliOptions {
 		return nil
 	}
 
+	// Validate flags
 	return &cliOptions{
 		match:         *match,
 		isShowMatched: *isShowMatched,
@@ -63,8 +64,8 @@ func parseOptions() *cliOptions {
 		isShowIgnored: *isShowIgnored,
 		isDebug:       *isDebug,
 		isProfile:     *isProfile,
-		outputFormat:  *outputFormat,
-		viewMode:      *viewMode,
+		outputFormat:  output.ValidateOutputFormat(*outputFormat),
+		viewMode:      view_mode.ValidateViewMode(*viewMode),
 	}
 }
 
@@ -173,7 +174,7 @@ func main() {
 
 	// Analyze code files
 	if internal.GlobalOpts.IsDebugEnabled {
-		fmt.Println("rootDirs:", rootDirs)
+		fmt.Println("rootDirs:", rootDirs) // Required to exist for test purpose, view: TestCMDWithInvalidOutputFormat for details.
 		fmt.Println("isDebug:", cliOptions.isDebug)
 		fmt.Println("output format:", cliOptions.outputFormat)
 		fmt.Println("view mode:", cliOptions.viewMode)
