@@ -7,6 +7,7 @@ Test for the Scanner
 package scanner
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -216,6 +217,67 @@ func TestScanUnsupportedFiles(t *testing.T) {
 	utils.AssertEqual(t, len(language.AllLanguages), 0)
 	utils.AssertEqual(t, len(language.AllLanguagesMap), 0)
 	utils.AssertEqual(t, len(file.AllCodeFiles), 0)
+
+	t.Cleanup(clearState)
+}
+
+func mockCodebase(t *testing.T) (rootDirs []string) {
+	t.Helper()
+	codeBase := t.TempDir()
+	rootDirs = append(rootDirs, codeBase)
+
+	createFile := func(name, content string) {
+		fd, _ := os.Create(filepath.Join(codeBase, name))
+		defer fd.Close()
+		fd.WriteString(content)
+	}
+
+	// Create a few files and dirs
+	createFile("main.go", "package main\n\nfunc main() {\n\tprintln(\"Hello, World!\")\n}\n")
+	createFile("main.py", "print('Hello, World!')\n")
+	createFile("main.js", "console.log('Hello, World!')\n")
+	createFile(".gitignore", "*.py\n*.js\nvendor\n")
+	os.Mkdir(filepath.Join(codeBase, "vendor"), 0755)
+	createFile("vendor/main.go", "package main\n\nfunc main() {\n\tprintln(\"Hello, World!\")\n}\n")
+	createFile("vendor/main.sh", "echo 'Hello, World!'\n")
+
+	return
+}
+
+func TestScannerRespectGitIgnore(t *testing.T) {
+	rootDirs := mockCodebase(t)
+	Scan(rootDirs)
+
+	utils.AssertEqual(t, uniqueDirSet.Len(), 1)
+	utils.AssertEqual(t, len(language.AllLanguages), 1)
+	utils.AssertEqual(t, len(language.AllLanguagesMap), 1)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 1)
+
+	t.Cleanup(clearState)
+}
+
+func TestScannerRespectGitIgnoreWithMatch(t *testing.T) {
+	rootDirs := mockCodebase(t)
+	Config(" .go$", "")
+	Scan(rootDirs)
+
+	utils.AssertEqual(t, uniqueDirSet.Len(), 2)
+	utils.AssertEqual(t, len(language.AllLanguages), 1)
+	utils.AssertEqual(t, len(language.AllLanguagesMap), 1)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 2)
+
+	t.Cleanup(clearState)
+}
+
+func TestScannerRespectGitIgnoreWithIgnore(t *testing.T) {
+	rootDirs := mockCodebase(t)
+	Config("", "vendor .js$")
+	Scan(rootDirs)
+
+	utils.AssertEqual(t, uniqueDirSet.Len(), 1)
+	utils.AssertEqual(t, len(language.AllLanguages), 1)
+	utils.AssertEqual(t, len(language.AllLanguagesMap), 1)
+	utils.AssertEqual(t, len(file.AllCodeFiles), 1)
 
 	t.Cleanup(clearState)
 }

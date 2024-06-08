@@ -14,6 +14,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/sabhiram/go-gitignore"
+
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
 	"github.com/92hackers/codetalks/internal/language"
@@ -26,6 +28,7 @@ var (
 	ignoreRegex    []*regexp.Regexp
 	currentRootDir string
 	vcsDirs        *utils.Set
+	gitIgnoreMap   map[string]*ignore.GitIgnore // { currentRootDir: gitignore-patterns }
 )
 
 func init() {
@@ -39,6 +42,7 @@ func init() {
 		vcsDirs.Add(".bzr")
 		vcsDirs.Add(".cvs")
 	}
+	gitIgnoreMap = make(map[string]*ignore.GitIgnore)
 }
 
 func Config(
@@ -89,6 +93,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// Cut the root directory from the scanned path.
 	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
+
 	// Match regex filter
 	{
 		isMatched := false
@@ -108,7 +113,22 @@ func handler(path string, d fs.DirEntry, err error) error {
 		if len(matchRegex) > 0 && !isMatched {
 			return nil
 		}
+
+		// Matched by matchRegex
+		// Custom match regular expression has over precedence over gitignore patterns
+
+		// Check if the file is ignored by gitignore
+		if !isMatched {
+			gi := gitIgnoreMap[currentRootDir]
+			if gi != nil && gi.MatchesPath(cutRootDirPath) {
+				if internal.GlobalOpts.IsDebugEnabled {
+					fmt.Println("File ignored by .gitignore rules:", path)
+				}
+				return nil
+			}
+		}
 	}
+
 	// Ignore regex filter
 	for _, re := range ignoreRegex {
 		if re.MatchString(cutRootDirPath) {
@@ -154,9 +174,15 @@ func handler(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
+func addGitIgnorePatterns(rootDir string) {
+	gi, _ := ignore.CompileIgnoreFile(filepath.Join(rootDir, ".gitignore"))
+	gitIgnoreMap[rootDir] = gi
+}
+
 func Scan(rootDirs []string) {
 	for _, dir := range rootDirs {
 		currentRootDir = dir
+		addGitIgnorePatterns(dir) // Only respect gitignore patterns for the root directory
 		// Scan directory
 		err := filepath.WalkDir(dir, handler)
 		if err != nil {
