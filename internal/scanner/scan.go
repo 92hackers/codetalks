@@ -182,7 +182,8 @@ func handler(path string, d fs.DirEntry, err error) error {
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
 		if internal.GlobalOpts.IsDebugEnabled {
-			fmt.Println("❌ Unsupported file type:", path)
+			// fmt.Println("Unsupported file type:", path)
+			utils.ErrorMsg("Unsupported file type: %s", path)
 		}
 		return nil
 	}

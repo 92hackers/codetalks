@@ -49,7 +49,7 @@ func expectOutputWithCommand(t *testing.T, expected string, args ...string) stri
 	output, _ := cmd.CombinedOutput()
 	outputStr := string(output)
 	if !strings.Contains(outputStr, expected) {
-		utils.ErrorMsg("Actual command:", cmd)
+		utils.ErrorMsg("Actual command: %s", cmd)
 		utils.Fail(t, expected, outputStr)
 	}
 	return outputStr

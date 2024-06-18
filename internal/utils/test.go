@@ -8,6 +8,7 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -35,7 +36,7 @@ func AssertNot(t *testing.T, actual any, expected any) {
 
 func Fail(t *testing.T, actual any, expected any) {
 	t.Helper()
-	ErrorMsg("Error: Expected %v but got %v", expected, actual)
+	ErrorMsg("Expected: %v Actual: %v", expected, actual)
 	t.FailNow()
 }
 
@@ -43,7 +44,7 @@ func ErrorMsg(format string, a ...any) {
 	color.NoColor = false
 	color.Set(color.FgRed)
 	defer color.Unset()
-	color.Red(format, a...)
+	color.Red(fmt.Sprintf(format, a...))
 }
 
 // CaptureStdout captures the output of a function that writes to stdout
