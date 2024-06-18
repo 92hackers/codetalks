@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -20,6 +21,7 @@ import (
 	"github.com/92hackers/codetalks/internal/file"
 	"github.com/92hackers/codetalks/internal/language"
 	"github.com/92hackers/codetalks/internal/utils"
+	"github.com/92hackers/codetalks/internal/view_mode"
 )
 
 var (
@@ -70,6 +72,25 @@ func isVCSDir(path string) bool {
 	return vcsDirs.Contains(path)
 }
 
+func isSpecifiedDepthDirs(path string, depth int) bool {
+	segments := make([]string, 0, 10)
+	for {
+		dir, file := filepath.Split(path)
+		trimedFile := strings.TrimSpace(file)
+		if trimedFile != "" {
+			segments = append(segments, trimedFile)
+		}
+		if dir == string(os.PathSeparator) || dir == "" {
+			break
+		}
+		if strings.HasSuffix(dir, string(os.PathSeparator)) {
+			dir = strings.TrimSuffix(dir, string(os.PathSeparator))
+		}
+		path = dir
+	}
+	return len(segments) == depth
+}
+
 func handler(path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
@@ -85,6 +106,15 @@ func handler(path string, d fs.DirEntry, err error) error {
 		// Skip VCS directories
 		if isVCSDir(leaf) {
 			return fs.SkipDir
+		}
+
+		// Store the directory if viewMode is set to directory
+		if internal.GlobalOpts.ViewMode == view_mode.ViewModeDirs {
+			// Check Depth and store the directory
+			// TODO: support multiple depth
+			if isSpecifiedDepthDirs(cutRootDirPath, 1) {
+				view_mode.SubDirs = append(view_mode.SubDirs, cutRootDirPath)
+			}
 		}
 
 		// Skip directories that are ignored by gitignore

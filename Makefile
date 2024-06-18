@@ -33,16 +33,20 @@ format:
 	@echo "Formatting..."
 	@go fmt ./...
 
-build:
+vet:
+	@echo "Vetting..."
+	@go vet ./...
+
+build: vet
 	@echo "Building..."
 	@mkdir -p bin
 	@go build -o bin/ ./cmd/...
 
-test:
+test: vet
 	@echo "Testing..."
 	@go test -v ./...
 
-install:
+install: vet
 	@echo "Installing..."
 	@go install ./cmd/...
 

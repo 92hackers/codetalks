@@ -11,20 +11,39 @@ import (
 	"io"
 	"os"
 	"testing"
+
+	"github.com/fatih/color"
 )
 
 func AssertEqual(t *testing.T, actual any, expected any) {
+	color.Set(color.FgRed)
+	defer color.Unset()
 	t.Helper()
 	if expected != actual {
-		t.Errorf("❌ Expected %v but got %v", expected, actual)
+		Fail(t, expected, actual)
 	}
 }
 
 func AssertNot(t *testing.T, actual any, expected any) {
+	color.Set(color.FgRed)
+	defer color.Unset()
 	t.Helper()
 	if expected == actual {
-		t.Errorf("❌ Expected %v but got %v", expected, actual)
+		Fail(t, expected, actual)
 	}
+}
+
+func Fail(t *testing.T, actual any, expected any) {
+	t.Helper()
+	ErrorMsg("Error: Expected %v but got %v", expected, actual)
+	t.FailNow()
+}
+
+func ErrorMsg(format string, a ...any) {
+	color.NoColor = false
+	color.Set(color.FgRed)
+	defer color.Unset()
+	color.Red(format, a...)
 }
 
 // CaptureStdout captures the output of a function that writes to stdout

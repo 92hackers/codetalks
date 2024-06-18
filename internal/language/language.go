@@ -119,7 +119,6 @@ func AnalyzeAllLanguages() {
 		for _, codeFile := range language.CodeFiles {
 			wg.Add(1)
 			go func(lang *Language, codeFile *file.CodeFile, ch chan<- *file.CodeFile) {
-				// TODO: Add error handling, handle timeout, and cancelation, maybe by <-done channell.
 				f, err := codeFile.Analyze()
 				if err != nil {
 					log.Println(err) // Log error and continue.

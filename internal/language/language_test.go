@@ -7,12 +7,18 @@ Testing for language package
 package language
 
 import (
+	"go.uber.org/goleak"
 	"path/filepath"
 	"testing"
 
 	"github.com/92hackers/codetalks/internal/file"
 	"github.com/92hackers/codetalks/internal/utils"
 )
+
+// TestMain is the entry point for the test
+func TestMain(m *testing.M) {
+	goleak.VerifyTestMain(m) // Check for goroutine leaks
+}
 
 func clearState() {
 	AllLanguages = AllLanguages[:0]                      // Reset

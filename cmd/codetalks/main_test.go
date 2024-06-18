@@ -13,7 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	// "github.com/92hackers/codetalks/internal/utils"
+
+	"github.com/92hackers/codetalks/internal/utils"
 )
 
 // Because we have already cd into the root directory,
@@ -48,8 +49,8 @@ func expectOutputWithCommand(t *testing.T, expected string, args ...string) stri
 	output, _ := cmd.CombinedOutput()
 	outputStr := string(output)
 	if !strings.Contains(outputStr, expected) {
-		t.Log("Actual command:", cmd)
-		t.Errorf("❌ Expected %s but got %s", expected, outputStr)
+		utils.ErrorMsg("Actual command:", cmd)
+		utils.Fail(t, expected, outputStr)
 	}
 	return outputStr
 }
@@ -94,7 +95,7 @@ func TestCMDWithMatchOption(t *testing.T) {
 		output := expectOutputWithCommand(t, expected, "-match", ".rs$ .go$ .py$ ", "--show-matched", codebase)
 		matchStr := "File matched"
 		if !strings.HasPrefix(output, matchStr) {
-			t.Errorf("❌ %s not found in %s", matchStr, output)
+			utils.Fail(t, matchStr, output)
 		}
 	})
 }
@@ -141,7 +142,7 @@ func TestCMDWithInvalidOutputFormat(t *testing.T) {
 }
 
 func TestCMDWithInvalidViewMode(t *testing.T) {
-	expected := "Valid view modes are: overview, files, directories"
+	expected := "Valid view modes are: overview, files, dirs"
 	output := expectOutputWithCommand(t, expected, "-view", "invalid", "--debug", filepath.Join(cwd, normalCodebase))
 	analyzeTimeStr := "Analyze time consumed"
 	if strings.Contains(output, analyzeTimeStr) {
@@ -151,4 +152,42 @@ func TestCMDWithInvalidViewMode(t *testing.T) {
 	if strings.Contains(output, debugStr) {
 		t.Errorf("❌ '%s' should not be found in output: %s", debugStr, output)
 	}
+}
+
+func TestCMDWithDirectoriesViewMode(t *testing.T) {
+	t.Skip("Skip this test because it's not implemented yet")
+	expected := `===============================================================================
+| Language     | Files     | Total      | Comments   | Blanks    | Code       |
+===============================================================================
+| ./           | 1         | 279        | 50         | 48        | 181        |
+-------------------------------------------------------------------------------
+| C            | 1         | 50         | 9          | 9         | 32         |
+| HTML         | 1         | 46         | 6          | 8         | 32         |
+| YAML         | 1         | 34         | 3          | 2         | 29         |
+| Markdown     | 1         | 41         | 0          | 15        | 26         |
+| Vue          | 1         | 36         | 9          | 3         | 24         |
+-------------------------------------------------------------------------------
+| ./small      | 1         | 279        | 50         | 48        | 181        |
+-------------------------------------------------------------------------------
+| Shell        | 1         | 45         | 14         | 8         | 23         |
+| C#           | 1         | 26         | 9          | 3         | 14         |
+| Plain Text   | 1         | 1          | 0          | 0         | 1          |
+-------------------------------------------------------------------------------
+| ./normal     | 1         | 279        | 50         | 48        | 181        |
+-------------------------------------------------------------------------------
+| Shell        | 1         | 45         | 14         | 8         | 23         |
+| C#           | 1         | 26         | 9          | 3         | 14         |
+| Plain Text   | 1         | 1          | 0          | 0         | 1          |
+-------------------------------------------------------------------------------
+| ./nested     | 1         | 279        | 50         | 48        | 181        |
+-------------------------------------------------------------------------------
+| Shell        | 1         | 45         | 14         | 8         | 23         |
+| C#           | 1         | 26         | 9          | 3         | 14         |
+| Plain Text   | 1         | 1          | 0          | 0         | 1          |
+===============================================================================
+| Total        | 8         | 279        | 50         | 48        | 181        |
+===============================================================================
+`
+	codebase := filepath.Join(cwd, "testdata")
+	expectOutputWithCommand(t, expected, "--view", "dirs", codebase)
 }

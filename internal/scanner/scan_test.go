@@ -298,3 +298,38 @@ func TestScannerRespectGitIgnoreWithIgnore(t *testing.T) {
 
 	t.Cleanup(clearState)
 }
+
+func TestIsSpecifiedDepthDirs(t *testing.T) {
+	type PathData struct {
+		path  string // The path will be relative to a root directory in source code.
+		depth int
+	}
+	truePaths := []PathData{
+		{"test", 1},
+		{"/test", 1},
+		{"/test/", 1},
+		{"/test//", 1},
+		{"/test/a", 2},
+		{"/test/a/b", 3},
+		{"/test/a/b/", 3},
+	}
+	falsePaths := []PathData{
+		{"test", 0},
+		{"/test", 0},
+		{"/test/", 2},
+		{"/test//", 2},
+		{"/test/a", 1},
+		{"/test/a/b", 2},
+	}
+
+	for _, pathData := range truePaths {
+		t.Run("truepath---"+pathData.path, func(t *testing.T) {
+			utils.AssertEqual(t, isSpecifiedDepthDirs(pathData.path, pathData.depth), true)
+		})
+	}
+	for _, pathData := range falsePaths {
+		t.Run("falsepath---"+pathData.path, func(t *testing.T) {
+			utils.AssertEqual(t, isSpecifiedDepthDirs(pathData.path, pathData.depth), false)
+		})
+	}
+}
