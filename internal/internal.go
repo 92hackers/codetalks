@@ -77,6 +77,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 
 	".md":  newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
 	".txt": newLangDef("Plain Text", []string{}, [][]string{{"", ""}}),
+	".sql": newLangDef("SQL", []string{"--"}, [][]string{{"/*", "*/"}}),
 }
 
 // Config files, map as file name -> file label.

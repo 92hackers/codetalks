@@ -6,6 +6,8 @@ package file
 
 import (
 	"bufio"
+	"context"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,10 +95,12 @@ func NewCodeFile(path string) (*CodeFile, error) {
 	return codeFile, nil
 }
 
-func (f *CodeFile) Analyze() (*CodeFile, error) {
-	isInBlockComment := false
-	isFirstLine := false
+type stateFlag struct {
+	isInBlockComment bool
+	isFirstLine      bool
+}
 
+func (f *CodeFile) Analyze(ctx context.Context) (*CodeFile, error) {
 	// Open file
 	fd, err := os.Open(f.Path)
 	if err != nil {
@@ -106,74 +110,85 @@ func (f *CodeFile) Analyze() (*CodeFile, error) {
 
 	scanner := bufio.NewScanner(fd)
 
+	scanState := stateFlag{}
 	// Init scanner buffer as 64KB, max token size as 10MB
 	scanner.Buffer(make([]byte, 0, 64*1024), 10*1024*1024)
 
-	langDefinition := internal.SupportedLanguages[f.FileExtension]
-
-scannerFor:
 	for scanner.Scan() {
-		line := scanner.Text()
-		f.TotalLines++
+		select {
+		case <-ctx.Done():
+			log.Println("Analyze timeout, skipping file: ", f.Path)
+			return nil, nil
 
-		line = strings.TrimSpace(line)
-
-		f.AddFileContent(line)
-
-		// shebang, treated as code
-		if isFirstLine == false && strings.HasPrefix(line, "#!") {
-			f.CodeCount++
-			isFirstLine = true
-			continue
+		default:
+			line := scanner.Text()
+			f.scanLine(line, &scanState)
 		}
-
-		if isInBlockComment == true {
-			f.CommentCount++
-			// Check if the block comment ends in this line
-			for _, comment := range langDefinition.BlockComments {
-				end := comment[1]
-				if len(end) > 0 && strings.Contains(line, end) {
-					isInBlockComment = false
-					break
-				}
-			}
-			continue
-		}
-
-		// Blank line
-		if line == "" {
-			f.BlankCount++
-			continue
-		}
-
-		// Single line comment
-		for _, comment := range langDefinition.LineComments {
-			if len(comment) > 0 && strings.HasPrefix(line, comment) {
-				f.CommentCount++
-				continue scannerFor
-			}
-		}
-
-		// Currently, nested block comments are not parsed..
-
-		// Block comment begin
-		for _, comment := range langDefinition.BlockComments {
-			begin, end := comment[0], comment[1]
-			if len(begin) > 0 && strings.HasPrefix(line, begin) {
-				// 1. Begining of a new block comment, if end is not in the same line.
-				if !strings.Contains(line, end) {
-					isInBlockComment = true
-				}
-				f.CommentCount++
-				continue scannerFor
-			}
-		}
-
-		// Code line
-		f.CodeCount++
 	}
 
 	return f, nil
+}
+
+func (f *CodeFile) scanLine(line string, state *stateFlag) {
+	f.TotalLines++
+
+	line = strings.TrimSpace(line)
+
+	f.AddFileContent(line)
+
+	langDefinition := internal.SupportedLanguages[f.FileExtension]
+
+	// shebang, treated as code
+	if state.isFirstLine == false && strings.HasPrefix(line, "#!") {
+		f.CodeCount++
+		state.isFirstLine = true
+		return
+	}
+
+	if state.isInBlockComment == true {
+		f.CommentCount++
+		// Check if the block comment ends in this line
+		for _, comment := range langDefinition.BlockComments {
+			end := comment[1]
+			if len(end) > 0 && strings.Contains(line, end) {
+				state.isInBlockComment = false
+				break
+			}
+		}
+		return
+	}
+
+	// Blank line
+	if line == "" {
+		f.BlankCount++
+		return
+	}
+
+	// Single line comment
+	for _, comment := range langDefinition.LineComments {
+		if len(comment) > 0 && strings.HasPrefix(line, comment) {
+			f.CommentCount++
+			return
+		}
+	}
+
+	// Currently, nested block comments are not parsed..
+
+	// Block comment begin
+	for _, comment := range langDefinition.BlockComments {
+		begin, end := comment[0], comment[1]
+		if len(begin) > 0 && strings.HasPrefix(line, begin) {
+			// 1. Begining of a new block comment, if end is not in the same line.
+			if !strings.Contains(line, end) {
+				state.isInBlockComment = true
+			}
+			f.CommentCount++
+			return
+		}
+	}
+
+	// Code line
+	f.CodeCount++
 }
 
 func (f *CodeFile) AddFileContent(content string) {

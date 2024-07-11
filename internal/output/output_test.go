@@ -18,7 +18,9 @@ import (
 func generateData() {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := file.NewCodeFile(f)
-	file.Analyze()
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 	lang := language.AddLanguage(".go", file)
 	lang.CountCodeFileStats(file)
 	language.AggreateStats()

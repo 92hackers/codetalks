@@ -54,7 +54,10 @@ func TestNewCodeFileWithInvalidPath(t *testing.T) {
 func TestAnalyze(t *testing.T) {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := NewCodeFile(f)
-	file.Analyze()
+
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 
 	utils.AssertEqual(t, file.CodeCount, uint32(7))
 	utils.AssertEqual(t, file.CommentCount, uint32(4))

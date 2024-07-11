@@ -30,7 +30,9 @@ func clearState() {
 func TestAddLanguage(t *testing.T) {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := file.NewCodeFile(f)
-	file.Analyze()
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 	lang := AddLanguage(".go", file)
 
 	utils.AssertEqual(t, len(AllLanguages), 1)
@@ -53,7 +55,9 @@ func TestAddLanguage(t *testing.T) {
 func TestGetLanguage(t *testing.T) {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := file.NewCodeFile(f)
-	file.Analyze()
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 	AddLanguage(".go", file)
 
 	lang := GetLanguage(".go")
@@ -69,7 +73,9 @@ func TestGetLanguage(t *testing.T) {
 func TestGetLanguageNonExisted(t *testing.T) {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := file.NewCodeFile(f)
-	file.Analyze()
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 	AddLanguage(".go", file)
 
 	lang := GetLanguage(".pyy")
@@ -84,7 +90,9 @@ func TestGetLanguageNonExisted(t *testing.T) {
 func TestAggreateStats(t *testing.T) {
 	f := filepath.Join("..", "..", "testdata/small/hello.go")
 	file, _ := file.NewCodeFile(f)
-	file.Analyze()
+	ctx, cancel := utils.WithTimeoutCtxSeconds(1)
+	defer cancel()
+	file.Analyze(ctx)
 	lang := AddLanguage(".go", file)
 
 	lang.CountCodeFileStats(file)

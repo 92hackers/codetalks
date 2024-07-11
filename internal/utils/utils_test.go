@@ -65,3 +65,29 @@ func TestAnalyzeTimeConsumed(t *testing.T) {
 	analyzeTimeConsumedStr := CaptureStdout(fn)
 	AssertEqual(t, analyzeTimeConsumedStr, "Analyze time consumed: 125ms\n")
 }
+
+func TestWithTimeoutCtxSeconds(t *testing.T) {
+	// WithTimeoutCtxSeconds
+	ctx, cancel := WithTimeoutCtxSeconds(1)
+	defer cancel()
+
+	select {
+	case <-ctx.Done():
+		AssertEqual(t, ctx.Err().Error(), "context deadline exceeded")
+	case <-time.After(2 * time.Second):
+		t.Error("timeout not working")
+	}
+}
+
+func TestWithTimeoutCtxMilliSeconds(t *testing.T) {
+	// WithTimeoutCtxMilliSeconds
+	ctx, cancel := WithTimeoutCtxMilliSeconds(1000)
+	defer cancel()
+
+	select {
+	case <-ctx.Done():
+		AssertEqual(t, ctx.Err().Error(), "context deadline exceeded")
+	case <-time.After(2 * time.Second):
+		t.Error("timeout not working")
+	}
+}

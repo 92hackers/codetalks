@@ -7,12 +7,14 @@ Supported programming languages.
 package language
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
 
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
+	"github.com/92hackers/codetalks/internal/utils"
 )
 
 // Language represents a programming language.
@@ -68,6 +70,9 @@ func (l *Language) AddCodeFile(file *file.CodeFile) *Language {
 }
 
 func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
+	if file == nil {
+		return l
+	}
 	l.CodeCount += file.CodeCount
 	l.CommentCount += file.CommentCount
 	l.BlankCount += file.BlankCount
@@ -117,16 +122,22 @@ func AnalyzeAllLanguages() {
 	for _, language := range AllLanguages {
 		ch := make(chan *file.CodeFile)
 		for _, codeFile := range language.CodeFiles {
+			// Every file has 1s to analyze itself.
+			// ctx, cancelCtx := utils.WithTimeoutCtxMilliSeconds(300)
+			ctx, cancelCtx := utils.WithTimeoutCtxSeconds(1)
+			defer cancelCtx()
+
 			wg.Add(1)
-			go func(lang *Language, codeFile *file.CodeFile, ch chan<- *file.CodeFile) {
-				f, err := codeFile.Analyze()
+			go func(codeFile *file.CodeFile, ch chan<- *file.CodeFile, ctx context.Context) {
+				defer wg.Done()
+				f, err := codeFile.Analyze(ctx)
 				if err != nil {
-					log.Println(err) // Log error and continue.
+					log.Println(err)
+					ch <- nil
 					return
 				}
 				ch <- f
-				wg.Done()
-			}(language, codeFile, ch)
+			}(codeFile, ch, ctx)
 		}
 
 		// Aggregate stats for the language
