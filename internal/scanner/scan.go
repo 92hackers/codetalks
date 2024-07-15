@@ -7,15 +7,12 @@ Scanner.
 package scanner
 
 import (
-	"fmt"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/sabhiram/go-gitignore"
 
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
@@ -25,26 +22,14 @@ import (
 )
 
 var (
-	uniqueDirSet   *utils.Set
-	matchRegex     []*regexp.Regexp
-	ignoreRegex    []*regexp.Regexp
-	currentRootDir string
-	vcsDirs        *utils.Set
-	gitIgnoreMap   map[string]*ignore.GitIgnore // { currentRootDir: gitignore-patterns }
+	uniqueDirSet *utils.Set
+	matchRegex   []*regexp.Regexp
+	ignoreRegex  []*regexp.Regexp
 )
 
 func init() {
 	// Initialize the unique directory set
 	uniqueDirSet = utils.NewSet()
-	vcsDirs = utils.NewSet()
-	{
-		vcsDirs.Add(".git")
-		vcsDirs.Add(".svn")
-		vcsDirs.Add(".hg")
-		vcsDirs.Add(".bzr")
-		vcsDirs.Add(".cvs")
-	}
-	gitIgnoreMap = make(map[string]*ignore.GitIgnore)
 }
 
 func Config(
@@ -66,10 +51,6 @@ func Config(
 			ignoreRegex = append(ignoreRegex, regexp.MustCompile(regexStr))
 		}
 	}
-}
-
-func isVCSDir(path string) bool {
-	return vcsDirs.Contains(path)
 }
 
 func isSpecifiedDepthDirs(path string, depth int) bool {
@@ -99,15 +80,10 @@ func handler(path string, d fs.DirEntry, err error) error {
 	leaf := filepath.Base(path)
 
 	// Cut the root directory from the scanned path.
-	cutRootDirPath := strings.TrimPrefix(path, currentRootDir)
+	cutRootDirPath := strings.TrimPrefix(path, utils.CurrentRootDir)
 
 	// dir
 	if d.IsDir() {
-		// Skip VCS directories
-		if isVCSDir(leaf) {
-			return fs.SkipDir
-		}
-
 		// Store the directory if viewMode is set to directory
 		if internal.GlobalOpts.ViewMode == view_mode.ViewModeDirs {
 			// Check Depth and store the directory
@@ -115,17 +91,6 @@ func handler(path string, d fs.DirEntry, err error) error {
 			if isSpecifiedDepthDirs(cutRootDirPath, 1) {
 				view_mode.SubDirs = append(view_mode.SubDirs, cutRootDirPath)
 			}
-		}
-
-		// Skip directories that are ignored by gitignore
-		//
-		// Custom match regular expression has over precedence over gitignore patterns NOT works for directories.
-		// For performance reasons, we skip directories that are ignored by gitignore.
-		// To avoid scanning the files in the ignored directories.
-		// To analyze thus directory, you can specific the directory as one of root directories.
-		//
-		if gi := gitIgnoreMap[currentRootDir]; gi != nil && gi.MatchesPath(cutRootDirPath) {
-			return fs.SkipDir
 		}
 
 		return nil
@@ -136,17 +101,18 @@ func handler(path string, d fs.DirEntry, err error) error {
 	// Match regex filter
 	{
 		isMatched := false
+
 		for _, re := range matchRegex {
 			if re.MatchString(cutRootDirPath) {
 				isMatched = true
 				// Log
 				if internal.GlobalOpts.IsDebugEnabled || internal.GlobalOpts.IsShowMatched {
-					fmt.Println("File matched:", path)
+					log.Println("File matched:", path)
 				}
 				break
 			}
 			if internal.GlobalOpts.IsDebugEnabled {
-				fmt.Println("Not matched:", path, "with regexp:", re.String())
+				log.Println("Not matched:", path, "with regexp:", re.String())
 			}
 		}
 		if len(matchRegex) > 0 && !isMatched {
@@ -156,12 +122,11 @@ func handler(path string, d fs.DirEntry, err error) error {
 		// Matched by matchRegex
 		// Custom match regular expression has over precedence over gitignore patterns
 
-		// Check if the file is ignored by gitignore
 		if !isMatched {
-			gi := gitIgnoreMap[currentRootDir]
-			if gi != nil && gi.MatchesPath(cutRootDirPath) {
+			// Check if the file is ignored by gitignore
+			if utils.ShouldIgnoreFile(cutRootDirPath) {
 				if internal.GlobalOpts.IsDebugEnabled {
-					fmt.Println("File ignored by .gitignore rules:", path)
+					log.Println("File ignored by .gitignore rules:", path)
 				}
 				return nil
 			}
@@ -172,7 +137,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 	for _, re := range ignoreRegex {
 		if re.MatchString(cutRootDirPath) {
 			if internal.GlobalOpts.IsDebugEnabled || internal.GlobalOpts.IsShowIgnored {
-				fmt.Println("File ignored:", path, "with regexp:", re.String())
+				log.Println("File ignored:", path, "with regexp:", re.String())
 			}
 			return nil
 		}
@@ -182,7 +147,6 @@ func handler(path string, d fs.DirEntry, err error) error {
 	fileExt := filepath.Ext(leaf)
 	if internal.SupportedLanguages[fileExt] == nil {
 		if internal.GlobalOpts.IsDebugEnabled {
-			// fmt.Println("Unsupported file type:", path)
 			utils.ErrorMsg("Unsupported file type: %s", path)
 		}
 		return nil
@@ -195,7 +159,7 @@ func handler(path string, d fs.DirEntry, err error) error {
 
 	// debug
 	if internal.GlobalOpts.IsDebugEnabled {
-		fmt.Println("Add new file:", path)
+		log.Println("Add new file:", path)
 	}
 
 	// Create a new code file, skip if error
@@ -214,18 +178,10 @@ func handler(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
-func addGitIgnorePatterns(rootDir string) {
-	gi, _ := ignore.CompileIgnoreFile(filepath.Join(rootDir, ".gitignore"))
-	gitIgnoreMap[rootDir] = gi
-}
-
 func Scan(rootDirs []string) {
 	for _, dir := range rootDirs {
-		currentRootDir = dir
-		addGitIgnorePatterns(dir) // Only respect gitignore patterns for the root directory
 		// Scan directory
-		err := filepath.WalkDir(dir, handler)
-		if err != nil {
+		if err := utils.WalkDir(dir, handler); err != nil {
 			log.Fatal(err)
 		}
 	}

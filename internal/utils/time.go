@@ -20,10 +20,10 @@ func formatDuration(d time.Duration) string {
 	return d.Round(scale / 100).String()
 }
 
-func TimeIt(fn func()) {
+func TimeIt(fn func(), task string) {
 	start := time.Now()
 	fn()
-	fmt.Println("Time taken:", formatDuration(time.Since(start)))
+	fmt.Println("Time taken:", formatDuration(time.Since(start)), "for", task)
 }
 
 // AnalyzeTimeConsumed is a function that returns a function that can be used to analyze the time consumed.

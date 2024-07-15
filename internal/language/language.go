@@ -7,7 +7,6 @@ Supported programming languages.
 package language
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -19,10 +18,6 @@ import (
 
 // Language represents a programming language.
 type Language struct {
-	// Language metadata
-	Name          string `json:"name"`
-	FileExtension string `json:"file_extension"`
-
 	// Cloc data
 	CodeCount    uint32 `json:"code"`
 	CommentCount uint32 `json:"comment_count"`
@@ -31,6 +26,10 @@ type Language struct {
 
 	FileCount uint32 `json:"file_count"`
 	CodeFiles []*file.CodeFile
+
+	// Language metadata
+	Name          string `json:"name"`
+	FileExtension string `json:"file_extension"`
 }
 
 // LanguageAggregateStats represents the aggregate statistics of all programming languages.
@@ -42,6 +41,9 @@ type LanguageAggregateStats struct {
 	TotalBlank   uint32 `json:"total_blank"`
 }
 
+// A mutex to protect the AllLanguages and AllLanguagesMap.
+var AllLangsLock sync.Mutex
+
 // All programming language types detected by codetalks.
 var AllLanguages []*Language
 
@@ -51,7 +53,7 @@ var AllLanguagesMap = map[string]uint{}
 // Aggregate stats for all programming languages.
 var AllLanguageAggregateStats = LanguageAggregateStats{}
 
-func NewLanguage(fileExtension string) *Language {
+func newLanguage(fileExtension string) *Language {
 	language := &Language{
 		Name:          internal.SupportedLanguages[fileExtension].Name,
 		FileExtension: fileExtension,
@@ -63,12 +65,14 @@ func NewLanguage(fileExtension string) *Language {
 	return language
 }
 
-func (l *Language) AddCodeFile(file *file.CodeFile) *Language {
+func (l *Language) addCodeFile(file *file.CodeFile) *Language {
 	l.FileCount += 1
 	l.CodeFiles = append(l.CodeFiles, file)
 	return l
 }
 
+// CountCodeFileStats counts the code, comment, and blank lines in a code file.
+// It's not thread-safe.
 func (l *Language) CountCodeFileStats(file *file.CodeFile) *Language {
 	if file == nil {
 		return l
@@ -96,11 +100,14 @@ func GetLanguage(fileExtension string) *Language {
 }
 
 func AddLanguage(fileExtension string, file *file.CodeFile) *Language {
+	AllLangsLock.Lock()
+	defer AllLangsLock.Unlock()
+
 	language := GetLanguage(fileExtension)
 	if language == nil {
-		language = NewLanguage(fileExtension)
+		language = newLanguage(fileExtension)
 	}
-	language.AddCodeFile(file)
+	language.addCodeFile(file)
 	return language
 }
 
@@ -120,7 +127,9 @@ func AnalyzeAllLanguages() {
 	var wg sync.WaitGroup
 
 	for _, language := range AllLanguages {
+		// A channel used to receive the analyzed files
 		ch := make(chan *file.CodeFile)
+
 		for _, codeFile := range language.CodeFiles {
 			// Every file has 1s to analyze itself.
 			// ctx, cancelCtx := utils.WithTimeoutCtxMilliSeconds(300)
@@ -128,7 +137,7 @@ func AnalyzeAllLanguages() {
 			defer cancelCtx()
 
 			wg.Add(1)
-			go func(codeFile *file.CodeFile, ch chan<- *file.CodeFile, ctx context.Context) {
+			go func(codeFile *file.CodeFile, ch chan<- *file.CodeFile) {
 				defer wg.Done()
 				f, err := codeFile.Analyze(ctx)
 				if err != nil {
@@ -137,7 +146,7 @@ func AnalyzeAllLanguages() {
 					return
 				}
 				ch <- f
-			}(codeFile, ch, ctx)
+			}(codeFile, ch)
 		}
 
 		// Aggregate stats for the language

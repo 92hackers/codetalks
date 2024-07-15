@@ -170,7 +170,7 @@ func main() {
 
 	// Scan root directories
 	scanner.Config(cliOptions.match, cliOptions.ignore)
-	scanner.Scan(rootDirs)
+	utils.TimeIt(func() { scanner.Scan(rootDirs) }, "Scanning files")
 
 	// Analyze code files
 	if internal.GlobalOpts.IsDebugEnabled {
@@ -179,7 +179,7 @@ func main() {
 		fmt.Println("output format:", cliOptions.outputFormat)
 		fmt.Println("view mode:", cliOptions.viewMode)
 		fmt.Println("AllCodeFiles:", len(file.AllCodeFiles))
-		utils.TimeIt(language.AnalyzeAllLanguages)
+		utils.TimeIt(language.AnalyzeAllLanguages, "Analyzing all languages and files")
 	} else {
 		language.AnalyzeAllLanguages()
 	}

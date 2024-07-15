@@ -34,7 +34,7 @@ func AssertNot(t *testing.T, actual any, expected any) {
 	}
 }
 
-func Fail(t *testing.T, actual any, expected any) {
+func Fail(t *testing.T, expected any, actual any) {
 	t.Helper()
 	ErrorMsg("Expected: %v Actual: %v", expected, actual)
 	t.FailNow()

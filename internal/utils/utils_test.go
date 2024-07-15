@@ -43,9 +43,9 @@ func TestTimeIt(t *testing.T) {
 	timeTakenStr := CaptureStdout(func() {
 		TimeIt(func() {
 			time.Sleep(100 * time.Millisecond)
-		})
+		}, "testTimeIt")
 	})
-	AssertEqual(t, timeTakenStr, "Time taken: 100ms\n")
+	AssertEqual(t, timeTakenStr, "Time taken: 100ms for testTimeIt\n")
 }
 
 func TestFormatDuration(t *testing.T) {

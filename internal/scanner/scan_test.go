@@ -63,15 +63,6 @@ func TestConfig(t *testing.T) {
 	utils.AssertEqual(t, matchRegex[1].MatchString("a/b/file_test.go"), true)
 }
 
-func TestIsVCSDir(t *testing.T) {
-	vscDirs := []string{".git", ".svn", ".hg", ".bzr", ".cvs"}
-	for _, dir := range vscDirs {
-		utils.AssertEqual(t, isVCSDir(dir), true)
-	}
-	utils.AssertEqual(t, isVCSDir(".fakegit"), false)
-	utils.AssertEqual(t, isVCSDir(".cvss"), false)
-}
-
 func TestScanEmptyCodebase(t *testing.T) {
 	codeBase := filepath.Join("..", "..", "testdata/empty")
 	rootDirs := []string{codeBase}

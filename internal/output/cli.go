@@ -52,6 +52,24 @@ func renderFooter() {
 // Sort by total lines of code in descending order
 func sortLanguagesByCode() {
 	sort.Slice(language.AllLanguages, func(i, j int) bool {
-		return language.AllLanguages[i].CodeCount > language.AllLanguages[j].CodeCount
+		a := language.AllLanguages[i]
+		b := language.AllLanguages[j]
+
+		// Sort by code count firstly
+		if a.CodeCount != b.CodeCount {
+			return a.CodeCount > b.CodeCount
+		}
+
+		// Sort by total lines if code count is same
+		if a.TotalLines != b.TotalLines {
+			return a.TotalLines > b.TotalLines
+		}
+
+		// Sort by files count if total lines are same
+		if a.FileCount != b.FileCount {
+			return a.FileCount > b.FileCount
+		}
+
+		return true
 	})
 }

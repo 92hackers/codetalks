@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/92hackers/codetalks/internal"
 )
@@ -23,14 +24,15 @@ const (
 	CONFIG_FILE
 )
 
+// Struct memory alignment consideration
 type FileMetadata struct {
 	// File metadata
+	LastModifiedAt uint64   `json:"last_modified_at"`
+	FileType       FileType `json:"file_type"`
 	Name           string   `json:"name"`
 	Path           string   `json:"path"`
 	Directory      string   `json:"directory"`
-	FileType       FileType `json:"file_type"`
 	FileExtension  string   `json:"file_extension"`
-	LastModifiedAt uint64   `json:"last_modified_at"`
 }
 
 type FileContent struct {
@@ -39,19 +41,21 @@ type FileContent struct {
 }
 
 type CodeFile struct {
-	FileMetadata
-	FileContent
-
 	// Cloc data
 	CodeCount    uint32 `json:"code"`
 	CommentCount uint32 `json:"comment_count"`
 	BlankCount   uint32 `json:"blank_count"`
 	TotalLines   uint32 `json:"total_lines"`
 
+	FileMetadata
+	FileContent
+
 	// Code language
 	Language string `json:"language"`
 }
 
+// A mutex to protect the AllCodeFiles.
+var AllCodeFilesLock sync.Mutex
 var AllCodeFiles = []*CodeFile{}
 
 type ConfigFile struct {
@@ -90,9 +94,15 @@ func NewCodeFile(path string) (*CodeFile, error) {
 	}
 
 	// Store the code file
-	AllCodeFiles = append(AllCodeFiles, codeFile)
+	addFile(codeFile)
 
 	return codeFile, nil
+}
+
+func addFile(codeFile *CodeFile) {
+	AllCodeFilesLock.Lock()
+	defer AllCodeFilesLock.Unlock()
+	AllCodeFiles = append(AllCodeFiles, codeFile)
 }
 
 type stateFlag struct {
@@ -172,8 +182,7 @@ func (f *CodeFile) scanLine(line string, state *stateFlag) {
 		}
 	}
 
-	// Currently, nested block comments are not parsed..
-
+	// Note: currently, nested block comments are not parsed..
 	// Block comment begin
 	for _, comment := range langDefinition.BlockComments {
 		begin, end := comment[0], comment[1]

@@ -37,14 +37,17 @@ vet:
 	@echo "Vetting..."
 	@go vet ./...
 
+# @go build -o bin/ ./cmd/...
+# -ldflags '-extldflags "-static"' means that the binary will be statically linked
 build: vet
 	@echo "Building..."
 	@mkdir -p bin
-	@go build -o bin/ ./cmd/...
+	@go build -ldflags '-extldflags "-static"' -o bin/ ./cmd/...
 
+# For a verbose output, use: go test -v ./... instead.
 test: vet
 	@echo "Testing..."
-	@go test -v ./...
+	@go test ./...
 
 install: vet
 	@echo "Installing..."

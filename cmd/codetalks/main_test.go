@@ -94,7 +94,7 @@ func TestCMDWithMatchOption(t *testing.T) {
 	t.Run("TestCMDWithMatchedShowed", func(t *testing.T) {
 		output := expectOutputWithCommand(t, expected, "-match", ".rs$ .go$ .py$ ", "--show-matched", codebase)
 		matchStr := "File matched"
-		if !strings.HasPrefix(output, matchStr) {
+		if !strings.Contains(output, matchStr) {
 			utils.Fail(t, matchStr, output)
 		}
 	})
@@ -122,7 +122,7 @@ func TestCMDWithIgnoreOption(t *testing.T) {
 	t.Run("TestCMDWithIgnoredShowed", func(t *testing.T) {
 		output := expectOutputWithCommand(t, expected, "-ignore", ".rs$ .go$ .py$ ", "--show-ignored", codebase)
 		matchStr := "File ignored"
-		if !strings.HasPrefix(output, matchStr) {
+		if !strings.Contains(output, matchStr) {
 			t.Errorf("❌ %s not found in %s", matchStr, output)
 		}
 	})
