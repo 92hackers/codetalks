@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/BurntSushi/rure-go v0.0.0-20231211185014-8a0f52724b91 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

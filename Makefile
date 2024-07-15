@@ -3,6 +3,14 @@
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
 
+# For building with cgo, you need to set the following environment variables:
+# export CGO_ENABLED=1
+# export CGO_LDFLAGS="-L/home/cy/projects/rust-exp/regex/target/release"
+# export LD_LIBRARY_PATH="/home/cy/projects/rust-exp/regex/target/release"
+#
+# Note: We must set above env vars at shell level, not in Makefile.
+#
+
 # Passed as: make release tag=v0.0.1
 tag ?=
 
