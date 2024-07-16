@@ -57,6 +57,9 @@ build: vet
 	@mkdir -p bin
 	@go build -gcflags=-m -ldflags '-extldflags "-static" -s -w' -o bin/ ./cmd/...
 
+compress: build
+	@upx -9 bin/codetalks
+
 # For a verbose output, use: go test -v ./... instead.
 test: vet
 	@echo "Testing..."
