@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 
 	"github.com/92hackers/codetalks/internal"
 	"github.com/92hackers/codetalks/internal/file"
@@ -31,6 +32,7 @@ type cliOptions struct {
 	isShowMatched bool
 	ignore        string // regular expression to ignore
 	isShowIgnored bool
+	disableGC     bool
 }
 
 func parseOptions() *cliOptions {
@@ -47,6 +49,8 @@ func parseOptions() *cliOptions {
 
 	ignore := flag.String("ignore", "", "Ignore files or directories that match the regular expression")
 	isShowIgnored := flag.Bool("show-ignored", false, "Show ignored files (works with -ignore option)")
+
+	disableGC := flag.Bool("disablegc", false, "Disable the garbage collection will speed up the program, but it will consume more memory")
 
 	// Parse the flags
 	flag.Parse()
@@ -66,6 +70,7 @@ func parseOptions() *cliOptions {
 		isProfile:     *isProfile,
 		outputFormat:  output.ValidateOutputFormat(*outputFormat),
 		viewMode:      view_mode.ValidateViewMode(*viewMode),
+		disableGC:     *disableGC,
 	}
 }
 
@@ -141,6 +146,11 @@ func main() {
 	cliOptions := parseOptions()
 	if cliOptions == nil {
 		os.Exit(0)
+	}
+
+	if cliOptions.disableGC {
+		// Disable the garbage collection.
+		debug.SetGCPercent(-1)
 	}
 
 	// Set the debug flag
