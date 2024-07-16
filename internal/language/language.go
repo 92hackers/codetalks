@@ -151,7 +151,8 @@ func AnalyzeAllLanguages() {
 
 		// Aggregate stats for the language
 		wg.Add(1)
-		go func(language *Language, ch <-chan *file.CodeFile) {
+		go func(language *Language, ch chan *file.CodeFile) {
+			defer close(ch)
 			for i := 0; i < len(language.CodeFiles); i++ {
 				language.CountCodeFileStats(<-ch)
 			}
