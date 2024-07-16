@@ -3,6 +3,14 @@
 repo_root=$(shell git rev-parse --show-toplevel)
 version=$(shell cat $(repo_root)/version.txt)
 
+# For building with cgo, you need to set the following environment variables:
+# export CGO_ENABLED=1
+# export CGO_LDFLAGS="-L/home/cy/projects/rust-exp/regex/target/release"
+# export LD_LIBRARY_PATH="/home/cy/projects/rust-exp/regex/target/release"
+#
+# Note: We must set above env vars at shell level, not in Makefile.
+#
+
 # Passed as: make release tag=v0.0.1
 tag ?=
 
@@ -37,12 +45,20 @@ vet:
 	@echo "Vetting..."
 	@go vet ./...
 
+# Build options:
+#
 # @go build -o bin/ ./cmd/...
-# -ldflags '-extldflags "-static"' means that the binary will be statically linked
+# 1. -ldflags '-extldflags "-static"' means that the binary will be statically linked
+# 2. -s -w flags will strip the debug information from the binary
+# 3. -gcflags=-m will print the escape analysis information [Optimize tips]
+# 4. `upx -9 bin/codetalks` can be used to compress the binary further more, which can reduce the binary size by 50%.
 build: vet
 	@echo "Building..."
 	@mkdir -p bin
-	@go build -ldflags '-extldflags "-static"' -o bin/ ./cmd/...
+	@go build -gcflags=-m -ldflags '-extldflags "-static" -s -w' -o bin/ ./cmd/...
+
+compress: build
+	@upx -9 bin/codetalks
 
 # For a verbose output, use: go test -v ./... instead.
 test: vet

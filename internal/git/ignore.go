@@ -59,6 +59,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/BurntSushi/rure-go"
 )
 
 ////////////////////////////////////////////////////////////
@@ -73,7 +75,7 @@ type IgnoreParser interface {
 
 // This function pretty much attempts to mimic the parsing rules
 // listed above at the start of this file
-func getPatternFromLine(line string) (*regexp.Regexp, bool) {
+func getPatternFromLine(line string) (*rure.Regex, bool) {
 	// Trim OS-specific carriage returns.
 	line = strings.TrimRight(line, "\r")
 
@@ -144,7 +146,8 @@ func getPatternFromLine(line string) (*regexp.Regexp, bool) {
 	} else {
 		expr = "^(|.*/)" + expr
 	}
-	pattern, _ := regexp.Compile(expr)
+
+	pattern, _ := rure.Compile(expr)
 
 	return pattern, negatePattern
 }
@@ -153,7 +156,7 @@ func getPatternFromLine(line string) (*regexp.Regexp, bool) {
 
 // IgnorePattern encapsulates a pattern and if it is a negated pattern.
 type IgnorePattern struct {
-	Pattern *regexp.Regexp
+	Pattern *rure.Regex
 	Negate  bool
 	LineNo  int
 	Line    string
@@ -224,7 +227,7 @@ func (gi *GitIgnore) MatchesPathHow(f string) (bool, *IgnorePattern) {
 	matchesPath := false
 	var mip *IgnorePattern
 	for _, ip := range gi.patterns {
-		if ip.Pattern.MatchString(f) {
+		if ip.Pattern.IsMatch(f) {
 			// If this is a regular target (not negated with a gitignore
 			// exclude "!" etc)
 			if !ip.Negate {
