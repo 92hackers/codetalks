@@ -73,6 +73,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 
 	".json": newLangDef("JSON", []string{}, [][]string{{"", ""}}),
 	".yaml": newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),
+	".yml":  newLangDef("YAML", []string{"#"}, [][]string{{"", ""}}),
 	".toml": newLangDef("TOML", []string{"#"}, [][]string{{"", ""}}),
 
 	".md":  newLangDef("Markdown", []string{}, [][]string{{"", ""}}),
