@@ -31,6 +31,7 @@ var SupportedLanguages = map[string]*LanguageDefinition{
 	".hh":  newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".hpp": newLangDef("C++ Header", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".cpp": newLangDef("C++", []string{"//"}, [][]string{{"/*", "*/"}}),
+	".cc": newLangDef("C++", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".cs":  newLangDef("C#", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".rs":  newLangDef("Rust", []string{"//"}, [][]string{{"/*", "*/"}}),
 	".lua": newLangDef("Lua", []string{"--"}, [][]string{{"--[[", "]]"}}),
